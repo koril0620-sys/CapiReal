@@ -171,6 +171,16 @@ kbd{font-family:var(--mono);font-size:11.5px;background:var(--panel-2);border:1p
 footer{color:var(--muted);font-size:12px;max-width:1180px;margin:4px auto 0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 .sound-wrap{position:relative;display:inline-flex}
+.ai-box{display:grid;gap:8px;justify-items:start}
+.ai-text{width:100%;box-sizing:border-box;background:var(--me-soft);border:1px solid rgba(240,180,76,.4);border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:1.6;white-space:pre-wrap}
+.ai-text.err{background:var(--panel-2);border-color:var(--line);color:var(--muted)}
+.rv-ceo{display:flex;gap:10px;align-items:center;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.rv-ceo img{width:40px;height:40px;image-rendering:pixelated;border:1px solid var(--rival);border-radius:6px;background:var(--rival-soft);flex:none}
+.rv-ceo b{font-size:12.5px;color:var(--rival);font-weight:600}
+.rv-quote{font-size:12.5px;color:var(--fg);min-height:1.2em}
+.rv-ceo-report{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.rv-preview{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.rv-preview img{width:32px;height:32px;image-rendering:pixelated;border:1px solid var(--rival);border-radius:6px;flex:none}
 .sound-panel{position:absolute;right:0;top:calc(100% + 6px);z-index:60;min-width:200px;display:grid;gap:8px;padding:10px 12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
 .sound-vol{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;font-size:12.5px;color:var(--muted)}
 </style>
@@ -268,6 +278,10 @@ footer{color:var(--muted);font-size:12px;max-width:1180px;margin:4px auto 0}
         <div class="note" id="healthNote">월말 예상 변화 +4</div>
       </div>
       <div class="card">
+        <div class="rv-ceo">
+          <img id="rvImg" alt="" width="40" height="40">
+          <div><b id="rvName">뉴웨이브 대표</b><div class="rv-quote" id="rvQuote"></div></div>
+        </div>
         <div class="vs">
           <span class="h"></span><span class="h me">내 가게</span><span class="h rv">뉴웨이브</span>
           <span class="h">가격</span><span class="num me" id="vsP1">12,000</span><span class="num rv" id="vsP2">12,000</span>
@@ -284,7 +298,7 @@ footer{color:var(--muted);font-size:12px;max-width:1180px;margin:4px auto 0}
       </div>
     </aside>
   </main>
-  <footer>캡스톤 2 설계안의 권장값을 적용한 시제품이다. 하루 8초(1×, 낮 4초·밤 4초), 한 달 영업일 5일, 패배 판정과 결산은 월말, 뉴스·브리핑은 템플릿 문장(생성형 AI 연결 전). 단축키: <kbd>Space</kbd> 정지 · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 배속 · <kbd>←</kbd><kbd>→</kbd> 가격 · <kbd>L</kbd> 장부</footer>
+  <footer>캡스톤 2 설계안의 권장값을 적용한 시제품이다. 하루 8초(1×, 낮 4초·밤 4초), 한 달 영업일 5일, 패배 판정과 결산은 월말, 뉴스·브리핑은 템플릿 문장이고, 월말 결산·결과 화면에서 조언자의 AI 조언을 따로 요청할 수 있다. 단축키: <kbd>Space</kbd> 정지 · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 배속 · <kbd>←</kbd><kbd>→</kbd> 가격 · <kbd>L</kbd> 장부</footer>
 </div>
 
 <div class="overlay" id="startScreen">
@@ -293,7 +307,7 @@ footer{color:var(--muted);font-size:12px;max-width:1180px;margin:4px auto 0}
       <h2>캐피로그 · 실시간 상점가</h2>
       <p class="hero-sub">같은 거리의 경쟁사 뉴웨이브 상사와 12개월을 버틴다. 가격·품질·브랜드를 바꾸면 손님 흐름이 바로 달라지고, 투자 효과는 몇 주 뒤에 도착한다. 어떤 전략이 맞는지는 알려주지 않는다.</p>
     </div>
-    <div><h4>난도</h4><div class="opts" id="optDiff"></div></div>
+    <div><h4>난도</h4><div class="opts" id="optDiff"></div><div class="rv-preview" id="rvPreview"></div></div>
     <div><h4>조언자</h4><div class="opts" id="optAdv"></div></div>
     <div><h4>경영 계약 (선택)</h4><div class="opts" id="optCon"></div></div>
     <div class="row-end" style="justify-content:space-between">
@@ -337,6 +351,7 @@ footer{color:var(--muted);font-size:12px;max-width:1180px;margin:4px auto 0}
     </div>
     <div class="contract-box" id="stContract"></div>
     <div><h4>이번 달에 있었던 일</h4><div class="log" id="stLog" style="max-height:170px"></div></div>
+    <div class="ai-box"><button class="ghost" type="button" id="stAiBtn">✨ 조언자에게 AI 조언 듣기</button><div class="ai-text" id="stAi" hidden></div></div>
     <div class="row-end"><span class="note">Enter 또는 Space로 계속</span><button class="ghost" type="button" id="stLedger">장부 보기</button><button class="primary" type="button" id="stOk">확인하고 다음 달로</button></div>
   </div>
 </div>
@@ -354,7 +369,9 @@ footer{color:var(--muted);font-size:12px;max-width:1180px;margin:4px auto 0}
     <div class="result-head"><div class="grade" id="rpGrade">B</div><div style="display:grid;gap:4px;min-width:0"><h2 id="rpTitle">12개월 생존</h2><div class="note" id="rpSub"></div></div></div>
     <div><h4>한 판의 흐름</h4><svg class="chart" id="rpChart" viewBox="0 0 680 318" role="img" aria-label="월별 순자산과 점유율"></svg></div>
     <div><h4>눈에 띄는 기록</h4><ul class="facts" id="rpFacts"></ul></div>
+    <div class="rv-ceo rv-ceo-report" id="rpRival"><img id="rpRivalImg" alt="" width="40" height="40"><div><b id="rpRivalName"></b><div class="rv-quote" id="rpRivalQuote"></div></div></div>
     <div class="brief" id="rpBrief"></div>
+    <div class="ai-box"><button class="ghost" type="button" id="rpAiBtn">✨ 조언자에게 AI 총평 듣기</button><div class="ai-text" id="rpAi" hidden></div></div>
     <div id="rpCompareWrap"><h4>지난 판과 비교</h4><div class="compare" id="rpCompare"></div></div>
     <div class="row-end"><button class="ghost" type="button" id="rpLedger">장부 보기</button><button class="ghost" type="button" id="rpNew">조건 바꿔 새 판</button><button class="primary" type="button" id="rpRetry">같은 시장에서 다시</button></div>
   </div>
@@ -407,6 +424,60 @@ const CONTRACTS = {
   premium: { name: '프리미엄 브랜드', goal: '1년 평균 판매가를 경쟁사 평균보다 높게 유지한다.', fail: '12개월이 끝났을 때 내 평균가가 경쟁사 이하이면 실패.' },
   expand:  { name: '불황 속 확장', goal: '경기가 위축·불황인 날들의 평균 점유율을 50% 이상으로 만든다.', fail: '그 기간 평균 점유율이 50% 미만이면 실패.' },
 };
+/* 경쟁사 뉴웨이브 상사의 대표: 난도에 따라 MONOPOL 조직원이 맡는다 */
+const RIVAL_CEO = {
+  basic: { name: '준혁', img: 'img/rival_junhyuk.png', tag: '의욕만 앞선 신참 대표', lines: {
+    start: ['나도 이제 사장이야! 이 거리는 내가 접수한다.', '옆 가게? 금방 문 닫게 해 줄게.'],
+    attack15: ['할인이다 할인! 손님들 다 이리 와!', '가격으로 한번 붙어 보자고!'],
+    attack30: ['이번엔 30%다! 버틸 수 있으면 버텨 봐!'],
+    chain: ['대형 유통망이랑 계약했어. 이제 물량으로 밀어붙인다!'],
+    retrench: ['잠깐… 통장 잔고가 왜 이래…', '공세는 잠깐 쉰다. 쉬는 거야, 진 거 아니고!'],
+    investQ: ['우리도 설비 바꾼다. 품질로도 안 져!'],
+    investM: ['광고 크게 걸었다! 다들 우리 간판 봐!'],
+    priceDown: ['경기가 안 좋으니 값 좀 내려 볼까.'],
+    priceUp: ['장사 잘되니까 값 좀 올려도 되겠지?'],
+    priceMatch: ['네가 내리면 나도 내린다!'],
+    leading: ['말이 안 돼… 손님이 다 저쪽으로 가잖아.'],
+    trailing: ['봤지? 이 거리 주인은 나야!'],
+    endClear: ['…12개월이나 버티다니. 다음엔 안 봐준다.'],
+    endFail: ['거 봐, 사업이 장난인 줄 알았지?'],
+  } },
+  hard: { name: '준서', img: 'img/rival_junseo.png', tag: '여유로운 승부사', lines: {
+    start: ['재미있겠네. 네 가게 어디 한번 보자.'],
+    attack15: ['15% 정도면 몸풀기지.'],
+    attack30: ['이제 본게임이야. 30% 할인.'],
+    chain: ['유통망은 이미 내 손에 있어.'],
+    retrench: ['…계산이 틀렸군. 잠깐 숨 고르지.'],
+    investQ: ['품질 차이? 금방 메워 주지.'],
+    investM: ['광고는 이렇게 하는 거야.'],
+    priceDown: ['불경기엔 몸을 낮추는 법이지.'],
+    priceUp: ['수요가 넘치면 값을 올리는 게 상식이야.'],
+    priceMatch: ['따라오는 건 쉬워. 버티는 게 어렵지.'],
+    leading: ['…인정해야겠군. 이번 달은 네가 앞섰다.'],
+    trailing: ['아직 멀었어.'],
+    endClear: ['…인정한다. 다음엔 진지하게 가지.'],
+    endFail: ['예상대로군.'],
+  } },
+  extreme: { name: '혜경', img: 'img/rival_hyekyung.png', tag: 'MONOPOL의 수장', lines: {
+    start: ['시장은 내가 만드는 거야. 네가 아무리 잘해도 내가 흔들면 끝이야.'],
+    attack15: ['가볍게 흔들어 볼까.'],
+    attack30: ['이 거리에서 나보다 싸게 파는 곳은 없어.'],
+    chain: ['유통망은 전부 MONOPOL 쪽이야. 물건이 넘칠 거다.'],
+    retrench: ['…흥미롭군. 잠깐 물러나 주지.'],
+    investQ: ['품질도 내가 정한다.'],
+    investM: ['사람들은 내가 보여주는 걸 사.'],
+    priceDown: ['불황은 기회야. 약한 가게부터 쓰러지거든.'],
+    priceUp: ['수요가 있으면 값은 내가 정해.'],
+    priceMatch: ['패턴을 읽었어. 그걸로는 안 돼.'],
+    leading: ['…흥미롭군.'],
+    trailing: ['그 정도로는 내 시장에 흠집도 못 내.'],
+    endClear: ['살아남았군. 다음엔 시장째로 흔들어 주지.'],
+    endFail: ['시장은 결국 내 거야.'],
+  } },
+};
+const CEO = () => RIVAL_CEO[S.cfg.diff] || RIVAL_CEO.basic;
+const CEO_IMG = {};
+for (const [k, v] of Object.entries(RIVAL_CEO)) { const im = new Image(); im.src = v.img; CEO_IMG[k] = im; }
 const CREDIT = [{ g: 'A', limit: 50000000 }, { g: 'B', limit: 30000000 }, { g: 'C', limit: 15000000 }, { g: 'D', limit: 0 }];
 const INV = { q: { cost: 10000000, label: '품질 개선' }, mkt: { cost: 5000000, label: '마케팅 캠페인' } };
 const unitCost = Q => 5000 + 500 * Q;
@@ -432,6 +503,100 @@ const PEVENTS = {
       { label: '거절한다', note: '변화 없음', cost: 0, apply() {} },
     ],
   },
+  /* 아래부터 추가 이벤트: 결과에 확률이 섞여 있다 (시드로 정해짐) */
+  accident: {
+    title: '생산라인에서 사고가 났다',
+    body: '포장 라인 기계가 멈췄다. 당장 손님 응대에는 문제가 없지만, 그냥 두면 불량품이 섞여 나갈 수 있다.',
+    def: 1, random: true,
+    options: [
+      { label: '즉시 수리한다', note: '150만 · 확실', cost: 1500000, apply() { return '라인을 바로 고쳤다.'; } },
+      { label: '부분 수리 + 인력 재배치', note: '80만 · 대체로 잘 풀린다', cost: 800000, apply() { if (rand2() < 0.7) { S.me.Q = Math.min(10, S.me.Q + 0.3); return '재배치가 잘 맞아 품질이 조금 올랐다 (품질 +0.3).'; } S.me.Q = Math.max(1, S.me.Q - 0.3); return '임시 조치가 어긋나 품질이 조금 떨어졌다 (품질 −0.3).'; } },
+      { label: '그냥 둔다', note: '0원 · 운에 맡긴다', cost: 0, apply() { if (rand2() < 0.3) return '다행히 별일 없이 넘어갔다.'; S.me.B = Math.max(0, S.me.B - 5); worsenCredit(); return '불량품 민원이 퍼졌다. 브랜드 −5, 신용등급 하락.'; } },
+    ],
+  },
+  staff: {
+    title: '핵심 직원이 연봉 인상을 요구했다',
+    body: '매장 운영을 맡은 팀장이 경쟁사에서 제안을 받았다며 연봉 인상을 요구했다.',
+    def: 1, random: true,
+    options: [
+      { label: '요구를 받아들인다', note: '250만 · 품질 +0.5', cost: 2500000, apply() { S.me.Q = Math.min(10, S.me.Q + 0.5); S.me.B += 2; return '팀장이 남았다. 의욕이 올라 품질 +0.5, 브랜드 +2.'; } },
+      { label: '협상한다', note: '100만 · 대체로 잘 풀린다', cost: 1000000, apply() { if (rand2() < 0.7) { S.me.Q = Math.min(10, S.me.Q + 0.2); return '절충안에 합의했다 (품질 +0.2).'; } S.me.Q = Math.max(1, S.me.Q - 0.4); return '협상이 틀어져 분위기가 나빠졌다 (품질 −0.4).'; } },
+      { label: '거절한다', note: '0원 · 떠날 수도 있다', cost: 0, apply() { if (rand2() < 0.3) return '팀장은 결국 남기로 했다.'; S.me.Q = Math.max(1, S.me.Q - 0.6); S.me.B = Math.max(0, S.me.B - 3); S.rv.Q = Math.min(10, S.rv.Q + 0.3); return '팀장이 뉴웨이브로 옮겼다. 품질 −0.6, 브랜드 −3, 경쟁사 품질 +0.3.'; } },
+    ],
+  },
+  influencer: {
+    title: '유명 인플루언서가 협업을 제안했다',
+    body: '구독자 수가 많은 생활 인플루언서가 우리 가게를 소개하는 콘텐츠를 만들자고 한다. 반응은 장담할 수 없다.',
+    def: 0, random: true,
+    options: [
+      { label: '거절한다', note: '변화 없음', cost: 0, apply() {} },
+      { label: '작게 진행한다', note: '300만 · 대체로 효과', cost: 3000000, apply() { if (rand2() < 0.7) { S.me.B += 8; return '반응이 괜찮았다. 브랜드 +8.'; } S.me.B += 2; return '조회수가 기대보다 낮았다. 브랜드 +2.'; } },
+      { label: '전면 투자한다', note: '600만 · 대박 아니면 본전', cost: 6000000, apply() { if (rand2() < 0.4) { S.me.B += 18; return '영상이 크게 터졌다! 브랜드 +18.'; } S.me.B += 3; return '큰돈을 썼지만 반응이 미지근했다. 브랜드 +3.'; } },
+    ],
+  },
+  subsidy: {
+    title: '소상공인 지원금 신청 기간이 열렸다',
+    body: '구청이 상점가 소상공인 지원금 신청을 받는다. 서류를 꾸미면 더 많이 받을 수 있다는 소문도 돈다.',
+    def: 0, random: true,
+    options: [
+      { label: '신청하지 않는다', note: '변화 없음', cost: 0, apply() {} },
+      { label: '정직하게 신청한다', note: '0원 · 선정되면 500만', cost: 0, apply() { if (rand2() < 0.7) { S.me.cash += 5000000; return '지원금 500만이 들어왔다.'; } return '이번에는 선정되지 않았다.'; } },
+      { label: '서류를 부풀려 신청한다', note: '0원 · 들키면 큰일', cost: 0, apply() { const r = rand2(); if (r < 0.2) { S.me.cash += 10000000; return '지원금 1,000만을 받았다. 마음이 편하지는 않다.'; } if (r < 0.6) return '심사에서 탈락했다.'; S.me.cash -= 6000000; S.me.health = clamp(S.me.health - 6, 0, 100); worsenCredit(); return '허위 서류가 적발됐다. 환수·과태료 600만, 건강도 −6, 신용등급 하락.'; } },
+    ],
+  },
+  patent: {
+    title: '디자인 도용 경고장을 받았다',
+    body: '한 업체가 우리 포장 디자인이 자기 것을 베꼈다며 경고장을 보냈다. 근거가 약해 보이지만 확실하지 않다.',
+    def: 1, random: true,
+    options: [
+      { label: '합의금을 낸다', note: '300만 · 확실히 끝난다', cost: 3000000, apply() { return '합의로 조용히 끝냈다.'; } },
+      { label: '법적으로 대응한다', note: '120만 · 이기면 신뢰 상승', cost: 1200000, apply() { if (rand2() < 0.6) { S.me.B += 4; return '소송에서 이겼다. 브랜드 +4.'; } S.me.cash -= 5000000; return '소송에서 졌다. 배상금 500만.'; } },
+      { label: '무시한다', note: '0원 · 위험', cost: 0, apply() { if (rand2() < 0.3) return '상대가 더 문제 삼지 않았다.'; S.me.cash -= 7000000; S.me.B = Math.max(0, S.me.B - 5); S.me.health = clamp(S.me.health - 3, 0, 100); return '소송이 들어왔다. 배상 700만, 브랜드 −5, 건강도 −3.'; } },
+    ],
+  },
+  channel: {
+    title: '배달 앱이 입점을 제안했다',
+    body: '지역 배달 앱이 우리 가게를 첫 화면에 걸어주겠다고 한다. 입점비가 들지만 손님이 늘 수 있다.',
+    def: 0, random: true,
+    options: [
+      { label: '거절한다', note: '변화 없음', cost: 0, apply() {} },
+      { label: '입점한다', note: '200만 · 대체로 손님 증가', cost: 2000000, apply() { if (rand2() < 0.7) { addEffect({ key: 'channel', label: '배달 앱 입점 · 내 가게 매력 +10%', meAttract: 1.10, days: 15 }); return '주문이 늘기 시작했다. 15일간 내 가게 매력 +10%.'; } S.me.B += 2; return '입점은 했지만 노출이 적었다. 브랜드 +2.'; } },
+    ],
+  },
+  automation: {
+    title: '자동화 설비 할인 패키지 제안',
+    body: '설비 업체가 포장 자동화 기계를 할인가에 주겠다고 한다. 들여놓으면 개당 원가가 줄어든다.',
+    def: 0, random: true,
+    options: [
+      { label: '지나친다', note: '변화 없음', cost: 0, apply() {} },
+      { label: '설비를 들인다', note: '800만 · 원가 영구 절감', cost: 8000000, apply() { if (rand2() < 0.7) { S.me.costMod *= 0.94; return '설비가 잘 돌아간다. 개당 원가 −6% (영구).'; } S.me.costMod *= 0.98; return '설치가 늦어져 효과가 작다. 개당 원가 −2% (영구).'; } },
+    ],
+  },
+  recall: {
+    title: '불량품 민원이 들어왔다',
+    body: '일부 제품에서 불량이 나왔다는 민원이 접수됐다. 아직 크게 퍼지지는 않았다.',
+    def: 1, random: true,
+    options: [
+      { label: '자발적으로 리콜한다', note: '350만 · 신뢰 회복', cost: 3500000, apply() { S.me.B += 3; S.me.Q = Math.min(10, S.me.Q + 0.2); return '빠른 리콜로 오히려 칭찬을 받았다. 브랜드 +3, 품질 +0.2.'; } },
+      { label: '조용히 처리한다', note: '120만 · 소문나면 손해', cost: 1200000, apply() { if (rand2() < 0.6) return '조용히 마무리됐다.'; S.me.B = Math.max(0, S.me.B - 8); S.me.health = clamp(S.me.health - 4, 0, 100); return '숨긴 사실이 알려졌다. 브랜드 −8, 건강도 −4.'; } },
+      { label: '무시한다', note: '0원 · 매우 위험', cost: 0, apply() { if (rand2() < 0.2) return '다행히 더 커지지 않았다.'; S.me.B = Math.max(0, S.me.B - 12); S.me.health = clamp(S.me.health - 8, 0, 100); return '불량 소식이 뉴스에 났다. 브랜드 −12, 건강도 −8.'; } },
+    ],
+  },
+};
+const RANDOM_EVENT_KEYS = Object.keys(PEVENTS).filter(k => PEVENTS[k].random);
+
+/* 외부 충격: 결정 없이 일정 기간 시장 전체(나·경쟁사 모두)에 영향 */
+const SHOCKS = {
+  rateUp:    { title: '기준금리 인상', body: '중앙은행이 기준금리를 올렸다. 대출 이자가 늘어난다.', w: 1, days: 10, rate: 0.005, label: '금리 인상 · 대출 월 +0.5%p' },
+  rateDown:  { title: '기준금리 인하', body: '중앙은행이 기준금리를 내렸다. 대출 이자가 줄어든다.', w: 1, days: 10, rate: -0.003, label: '금리 인하 · 대출 월 −0.3%p' },
+  fxUp:      { title: '환율 급등', body: '원달러 환율이 뛰어 수입 원료값이 올랐다.', w: 0.8, days: 8, cost: 1.08, label: '환율 급등 · 원가 +8%' },
+  rawUp:     { title: '국제 원자재값 폭등', body: '국제 원자재 가격이 크게 올랐다. 장기 계약을 맺은 가게는 영향을 받지 않는다.', w: 1, days: 6, cost: 1.12, label: '원자재 폭등 · 원가 +12%' },
+  rawDown:   { title: '국제 원자재값 하락', body: '국제 원자재 가격이 내렸다.', w: 1, days: 6, cost: 0.92, label: '원자재 하락 · 원가 −8%' },
+  moodDown:  { title: '소비 심리 위축', body: '경기 불안 뉴스가 이어지며 사람들이 지갑을 닫았다.', w: 1, days: 6, demand: 0.85, label: '소비 위축 · 손님 −15%' },
+  moodUp:    { title: '소비 심리 회복', body: '좋은 소식이 이어지며 거리에 사람이 늘었다.', w: 1, days: 6, demand: 1.12, label: '소비 회복 · 손님 +12%' },
+  stimulus:  { title: '정부 경기 부양책 발표', body: '정부가 지역 상품권과 소비 쿠폰을 풀었다. 다음 달 경기는 성장 국면이 된다.', w: 0.7, days: 5, demand: 1.08, phase: 1, label: '부양책 · 손님 +8%' },
+  austerity: { title: '긴축 정책 발표', body: '정부가 지출을 줄이겠다고 발표했다. 다음 달 경기는 위축 국면이 된다.', w: 0.7, days: 5, demand: 0.92, phase: 3, label: '긴축 · 손님 −8%' },
+  epidemic:  { title: '감염병 유행', body: '감염병이 번지며 거리에 사람이 줄고 물류도 막혔다.', w: 0.3, days: 8, demand: 0.75, cost: 1.06, label: '감염병 · 손님 −25%, 원가 +6%' },
 };
 
 /* ---------- 상태 ---------- */
@@ -449,6 +614,27 @@ function rand() {
   t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
+// 추가 이벤트 전용 난수: 기존 시장 흐름(시드)이 바뀌지 않도록 따로 돌린다
+function rand2() {
+  let a = S.rs2 = (S.rs2 + 0x6D2B79F5) | 0;
+  let t = Math.imul(a ^ (a >>> 15), 1 | a);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+// 경쟁사 대표 한마디: 거리 장면 말풍선 + 오른쪽 카드에 표시
+function rivalSay(key) {
+  const lines = CEO().lines[key]; if (!lines || !lines.length) return;
+  S.sayIdx = S.sayIdx || {};
+  const i = S.sayIdx[key] || 0; S.sayIdx[key] = i + 1;
+  S.say = { key, text: lines[i % lines.length], g: S.g, t: Date.now() };
+}
+function worsenCredit() { S.me.credit = Math.min(3, S.me.credit + 1); }
+function addEffect(e) {
+  S.effects = S.effects.filter(x => x.key !== e.key);
+  S.effects.push({ ...e, until: S.g + e.days });
+}
+const effMul = (field, filter = () => true) => S.effects.filter(filter).reduce((m, e) => m * (e[field] ?? 1), 1);
+const effSum = field => S.effects.reduce((m, e) => m + (e[field] ?? 0), 0);
 const blankMon = () => ({ rev: 0, var: 0, fixed: 0, invest: 0, interest: 0, uM: 0, uR: 0, rvRev: 0, rvVar: 0, shareSum: 0, ticks: 0, priceSum: 0, rpSum: 0, emerg: false });
 const rivalPrice = () => Math.round(S.rv.base * S.rv.mult / 100) * 100;
 
@@ -460,10 +646,11 @@ function newGame(cfg) {
   const d = DIFF[cfg.diff];
   S = {
     cfg, rs: (cfg.seed >>> 0) || 1, g: 0, tick: 0, dayFrac: 0, dayShare: 0, phase: 2,
-    me: { price: 12000, Q: 5, B: 30, cash: Math.round(30000000 * d.cash), debt: 0, emerg: 0, credit: 1, health: 60, streak: 0, supplier: 1, supplierUntil: -1, locked: false, everBorrowed: false, profitStreak: 0 },
+    me: { price: 12000, Q: 5, B: 30, cash: Math.round(30000000 * d.cash), debt: 0, emerg: 0, credit: 1, health: 60, streak: 0, supplier: 1, supplierUntil: -1, locked: false, everBorrowed: false, profitStreak: 0, costMod: 1 },
     rv: { base: 12000, mult: 1, attackLeft: 0, cooldown: 0, Q: 5, B: 30, cash: 45000000, retrench: false, lastAdj: -99, label: '' },
     pending: [], mon: blankMon(), months: [], days: [], log: [], decisions: [], attacks: [], event: null,
     shownRp: 12000, lastLoggedPrice: 12000, ended: null, forced: {}, sched: [], startCash: Math.round(30000000 * d.cash),
+    rs2: (((cfg.seed >>> 0) || 1) ^ 0x9E3779B9) | 0, effects: [], say: null,
   };
   const chain = 5 + Math.floor(rand() * 2);
   S.chainMonth = chain;
@@ -473,19 +660,46 @@ function newGame(cfg) {
   S.sched.push({ g: 8 * DPM + 2, kind: 'pevent', key: 'festival' });
   const rm = rand() < 0.5 ? 4 : 10; S.sched.push({ g: (rm - 1) * DPM + Math.floor(rand() * DPM), kind: 'review' });
   const mm = rand() < 0.5 ? 2 : 11; S.sched.push({ g: (mm - 1) * DPM + Math.floor(rand() * DPM), kind: 'material' });
-  news(`시장 ${cfg.seed}번에서 영업을 시작했다. 같은 거리에 경쟁사 뉴웨이브 상사가 있다.`);
+  scheduleExtraEvents();
+  news(`시장 ${cfg.seed}번에서 영업을 시작했다. 같은 거리에 경쟁사 뉴웨이브 상사(대표 ${CEO().name})가 있다.`);
+  rivalSay('start');
+}
+
+// 결정 이벤트(2~12월, 달마다 35%)와 외부 충격(달마다 35%)을 시드에 따라 배치
+function scheduleExtraEvents() {
+  const taken = new Set(S.sched.map(it => it.g));
+  const freeDay = (month) => {
+    for (let tries = 0; tries < 8; tries++) {
+      const g = (month - 1) * DPM + 1 + Math.floor(rand2() * (DPM - 1));
+      if (!taken.has(g)) { taken.add(g); return g; }
+    }
+    return null;
+  };
+  const pool = [...RANDOM_EVENT_KEYS];
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(rand2() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  for (let m = 2; m <= MONTHS && pool.length; m++) {
+    if (rand2() < 0.35) { const g = freeDay(m); if (g != null) S.sched.push({ g, kind: 'pevent', key: pool.shift() }); }
+  }
+  const keys = Object.keys(SHOCKS), weight = keys.reduce((s, k) => s + SHOCKS[k].w, 0);
+  for (let m = 1; m <= MONTHS; m++) {
+    if (rand2() >= 0.35) continue;
+    let r = rand2() * weight, key = keys[0];
+    for (const k of keys) { r -= SHOCKS[k].w; if (r <= 0) { key = k; break; } }
+    const g = freeDay(m); if (g != null) S.sched.push({ g, kind: 'shock', key });
+  }
 }
 
 /* ---------- 엔진: ¼일 틱 ---------- */
 function engineTick() {
   const ph = PHASES[S.phase], me = S.me, rv = S.rv, m = S.mon;
   const rp = rivalPrice();
-  const aM = attract(me.price, me.Q, me.B, ph.elas), aR = attract(rp, rv.Q, rv.B, ph.elas);
+  const aM = attract(me.price, me.Q, me.B, ph.elas) * effMul('meAttract'), aR = attract(rp, rv.Q, rv.B, ph.elas);
   const sM = (aM * aM) / (aM * aM + aR * aR);
   const tf = clamp(Math.pow(REF / ((me.price + rp) / 2), 0.6), 0.5, 1.5);
-  const potential = BASE * ph.demand * (0.94 + rand() * 0.12) / TICKS;
+  const potential = BASE * ph.demand * (0.94 + rand() * 0.12) / TICKS * effMul('demand');
   const units = potential * tf, uM = units * sM, uR = units - uM;
-  const cM = unitCost(me.Q) * me.supplier, cR = unitCost(rv.Q);
+  const shockCost = effMul('cost'), shockCostMe = me.locked ? effMul('cost', e => e.key !== 'rawUp' && e.key !== 'fxUp') : shockCost;
+  const cM = unitCost(me.Q) * me.supplier * me.costMod * shockCostMe, cR = unitCost(rv.Q) * shockCost;
   me.cash += uM * (me.price - cM); rv.cash += uR * (rp - cR);
   m.rev += uM * me.price; m.var += uM * cM; m.uM += uM; m.uR += uR; m.rvRev += uR * rp; m.rvVar += uR * cR;
   m.shareSum += sM; m.ticks++; m.priceSum += me.price; m.rpSum += rp;
@@ -508,6 +722,8 @@ function endDay() {
   if (rv.cooldown > 0) rv.cooldown--;
   S.g++;
   if (me.supplierUntil >= 0 && S.g >= me.supplierUntil) { me.supplier = 1; me.supplierUntil = -1; news('원자재 단가가 이전 수준으로 돌아왔다.'); }
+  for (const e of S.effects.filter(e => e.until <= S.g)) news(`'${e.label.split(' · ')[0]}' 영향이 끝났다.`);
+  S.effects = S.effects.filter(e => e.until > S.g);
   for (const p of S.pending.filter(p => p.at <= S.g)) {
     const who = p.who === 'me' ? me : rv;
     if (p.kind === 'q') who.Q = Math.min(10, who.Q + 1); else who.B += 12;
@@ -519,8 +735,9 @@ function endDay() {
   for (const it of S.sched) if (!it.done && it.g === S.g) { it.done = true; runScheduled(it); }
 }
 
-function startAttack(mult, days, label) {
+function startAttack(mult, days, label, quiet) {
   const rv = S.rv;
+  if (!quiet) rivalSay(mult <= 0.7 ? 'attack30' : 'attack15');
   rv.mult = mult; rv.attackLeft = days; rv.cooldown = days + 10; rv.label = label;
   S.attacks.push({ start: S.g, end: S.g + days, label });
   news(`경쟁사가 '${label}' 공세를 시작했다.`, 'attack');
@@ -531,7 +748,7 @@ function rivalDecide() {
   const rv = S.rv, me = S.me, d = D();
   const share = S.days.length ? S.days[S.days.length - 1].share : 0.5;
   if (rv.cash < 0) {
-    if (!rv.retrench) { rv.retrench = true; rv.attackLeft = 0; rv.mult = 1; rv.base = Math.min(15000, Math.round(rv.base * 1.05 / 100) * 100); news('경쟁사가 자금난으로 공세를 멈추고 가격을 올렸다.', 'rival'); }
+    if (!rv.retrench) { rv.retrench = true; rv.attackLeft = 0; rv.mult = 1; rv.base = Math.min(15000, Math.round(rv.base * 1.05 / 100) * 100); news('경쟁사가 자금난으로 공세를 멈추고 가격을 올렸다.', 'rival'); rivalSay('retrench'); }
     return;
   }
   rv.retrench = false;
@@ -541,31 +758,38 @@ function rivalDecide() {
   const rvShare = 1 - share;
   if (rvShare < 0.42 && rv.cash > 20000000 && !S.pending.some(p => p.who === 'rv' && p.kind === 'mkt')) {
     rv.cash -= 5000000; S.pending.push({ who: 'rv', kind: 'mkt', at: S.g + d.delay, start: S.g });
-    news('경쟁사가 대대적인 광고 캠페인을 시작했다.', 'rival'); return;
+    news('경쟁사가 대대적인 광고 캠페인을 시작했다.', 'rival'); rivalSay('investM'); return;
   }
   if (me.Q > rv.Q + 0.4 && rv.cash > 25000000 && !S.pending.some(p => p.who === 'rv' && p.kind === 'q')) {
     rv.cash -= 10000000; S.pending.push({ who: 'rv', kind: 'q', at: S.g + d.delay, start: S.g });
-    news('경쟁사가 생산 설비 개선에 들어갔다.', 'rival'); return;
+    news('경쟁사가 생산 설비 개선에 들어갔다.', 'rival'); rivalSay('investQ'); return;
   }
   if (rv.cash > 50000000 && S.phase <= 2 && !S.pending.some(p => p.who === 'rv')) {
-    if (rv.Q <= me.Q + 0.5 && rv.Q < 10) { rv.cash -= 10000000; S.pending.push({ who: 'rv', kind: 'q', at: S.g + d.delay, start: S.g }); news('경쟁사가 남는 자금으로 설비를 늘리기 시작했다.', 'rival'); return; }
-    if (rv.B < me.B + 10) { rv.cash -= 5000000; S.pending.push({ who: 'rv', kind: 'mkt', at: S.g + d.delay, start: S.g }); news('경쟁사가 새 광고를 내걸었다.', 'rival'); return; }
+    if (rv.Q <= me.Q + 0.5 && rv.Q < 10) { rv.cash -= 10000000; S.pending.push({ who: 'rv', kind: 'q', at: S.g + d.delay, start: S.g }); news('경쟁사가 남는 자금으로 설비를 늘리기 시작했다.', 'rival'); rivalSay('investQ'); return; }
+    if (rv.B < me.B + 10) { rv.cash -= 5000000; S.pending.push({ who: 'rv', kind: 'mkt', at: S.g + d.delay, start: S.g }); news('경쟁사가 새 광고를 내걸었다.', 'rival'); rivalSay('investM'); return; }
   }
   if (S.g - rv.lastAdj < DPM) return;
-  if (S.phase >= 3 && rv.base > 10500) { rv.base = Math.round(rv.base * 0.97 / 100) * 100; rv.lastAdj = S.g; news(`경쟁사가 기본 가격을 ${fmtWon(rv.base)}으로 내렸다.`, 'rival'); return; }
-  if (S.phase <= 1 && rvShare > 0.5 && rv.base < 14500) { rv.base = Math.round(rv.base * 1.03 / 100) * 100; rv.lastAdj = S.g; news(`경쟁사가 기본 가격을 ${fmtWon(rv.base)}으로 올렸다.`, 'rival'); return; }
-  if (me.price < rv.base * 0.9 && rvShare < 0.45) { rv.base = Math.max(9000, Math.round((rv.base + me.price) / 2 / 100) * 100); rv.lastAdj = S.g; news(`경쟁사가 가격을 ${fmtWon(rv.base)}으로 맞췄다.`, 'rival'); }
+  if (S.phase >= 3 && rv.base > 10500) { rv.base = Math.round(rv.base * 0.97 / 100) * 100; rv.lastAdj = S.g; news(`경쟁사가 기본 가격을 ${fmtWon(rv.base)}으로 내렸다.`, 'rival'); rivalSay('priceDown'); return; }
+  if (S.phase <= 1 && rvShare > 0.5 && rv.base < 14500) { rv.base = Math.round(rv.base * 1.03 / 100) * 100; rv.lastAdj = S.g; news(`경쟁사가 기본 가격을 ${fmtWon(rv.base)}으로 올렸다.`, 'rival'); rivalSay('priceUp'); return; }
+  if (me.price < rv.base * 0.9 && rvShare < 0.45) { rv.base = Math.max(9000, Math.round((rv.base + me.price) / 2 / 100) * 100); rv.lastAdj = S.g; news(`경쟁사가 가격을 ${fmtWon(rv.base)}으로 맞췄다.`, 'rival'); rivalSay('priceMatch'); }
 }
 
 function runScheduled(it) {
   const me = S.me, rv = S.rv;
   if (it.kind === 'chainAttack') {
     news('업계 소식: 뉴웨이브 상사가 대형 유통망과 공급 계약을 맺었다.', 'rival');
-    rv.attackLeft = 0; startAttack(0.80, 10, '물량 공세 20%');
+    rv.attackLeft = 0; rivalSay('chain'); startAttack(0.80, 10, '물량 공세 20%', true);
     rv.cash += 8000000;
   } else if (it.kind === 'pevent') {
+    if (S.event) { it.done = false; it.g = S.g + 1; return; }   // 이미 다른 결정이 떠 있으면 하루 미룬다
     S.event = { key: it.key, g: S.g, ticksLeft: D().pauseDecide ? null : TICKS };
     hooks.event();
+  } else if (it.kind === 'shock') {
+    const sh = SHOCKS[it.key];
+    addEffect({ key: it.key, label: sh.label, demand: sh.demand, cost: sh.cost, rate: sh.rate, days: sh.days });
+    if (sh.phase != null) { const next = S.months.length + 1; if (S.forced[next] == null) S.forced[next] = sh.phase; }
+    news(`[경제 뉴스] ${sh.title}. ${sh.body}`, 'phase');
+    hooks.toast?.(`📰 ${sh.title} — ${sh.label.split(' · ')[1] || ''}`);
   } else if (it.kind === 'review') {
     const meWin = me.Q >= rv.Q;
     (meWin ? me : rv).B += 5;
@@ -578,12 +802,16 @@ function runScheduled(it) {
 
 function resolveEvent(idx, timeout) {
   if (!S.event) return;
-  const ev = PEVENTS[S.event.key], opt = ev.options[idx];
+  const ev = PEVENTS[S.event.key];
+  // 시간 초과로 기본 선택지가 처리될 때 돈이 모자라면, 낼 수 있는 가장 싼 선택지로 처리
+  if (timeout && ev.options[idx].cost > S.me.cash) idx = ev.options.reduce((b, o, i) => (o.cost < ev.options[b].cost ? i : b), 0);
+  const opt = ev.options[idx];
   if (opt.cost > S.me.cash) return false;
   S.me.cash -= opt.cost; S.mon.invest += opt.cost;
-  opt.apply();
+  const outcome = opt.apply();
   S.decisions.push({ g: S.g, kind: 'event', text: `${ev.title}: ${opt.label}${timeout ? ' (무대응)' : ''}` });
   news(timeout ? `응답하지 못해 '${opt.label}'로 처리됐다.` : `결정: ${opt.label}.`, timeout ? 'bad' : 'me');
+  if (typeof outcome === 'string') { news(outcome, /−|하락|졌다|적발|탈락|틀어|어긋|떠|뉴스에|알려졌다|소송이/.test(outcome) ? 'bad' : 'good'); hooks.toast?.(outcome); }
   S.event = null;
   hooks.event();
   return true;
@@ -599,7 +827,7 @@ function endMonth() {
   const me = S.me, rv = S.rv, m = S.mon, d = D();
   const mNo = S.months.length + 1;
   me.cash -= FIXED; m.fixed += FIXED; rv.cash -= FIXED;
-  const intr = me.debt * (0.01 + d.rateAdd / 12) + me.emerg * EMERG_RATE;
+  const intr = me.debt * Math.max(0.002, 0.01 + d.rateAdd / 12 + effSum('rate')) + me.emerg * EMERG_RATE;
   me.cash -= intr; m.interest += intr;
   me.B = Math.max(0, me.B - 1.5); rv.B = Math.max(0, rv.B - 1.5);
   if (me.cash < 0) {
@@ -624,6 +852,7 @@ function endMonth() {
   S.months.push(row);
   S.mon = blankMon();
   if (prev !== S.phase) { news(`경기가 '${PHASES[prev].name}'에서 '${PHASES[S.phase].name}'(으)로 바뀌었다.`, 'phase'); hooks.tip('phase'); }
+  if (share > 0.6) rivalSay('leading'); else if (share < 0.4) rivalSay('trailing');
   if (me.health <= 0) return endGame('health');
   if (me.streak >= 4) return endGame('capital');
   if (mNo >= MONTHS) return endGame('clear');
@@ -642,12 +871,12 @@ function projectedMonth() {
   const m = S.mon, me = S.me, left = DPM * TICKS - m.ticks, lastRow = S.months[S.months.length - 1];
   const gross = m.rev - m.var;
   const rate = m.ticks >= 2 ? gross / m.ticks : lastRow ? (lastRow.rev - lastRow.var) / (DPM * TICKS) : 0;
-  const intr = me.debt * (0.01 + D().rateAdd / 12) + me.emerg * EMERG_RATE;
+  const intr = me.debt * Math.max(0.002, 0.01 + D().rateAdd / 12 + effSum('rate')) + me.emerg * EMERG_RATE;
   const opEst = gross + rate * left - FIXED - intr;
   return { gross, opEst, intr, rev: m.rev };
 }
 
-function endGame(reason) { S.ended = reason; hooks.end(); }
+function endGame(reason) { S.ended = reason; rivalSay(reason === 'clear' ? 'endClear' : 'endFail'); hooks.end(); }
 
 /* ---------- 플레이어 행동 ---------- */
 function setPrice(v, log) {
@@ -846,6 +1075,17 @@ function glowStore(st, o, a) {
   }
 }
 
+function drawBubble(msg) {
+  const bx = RV.x + 2, bw = RV.w - 4, by = 1, pad = 3, av = 18;
+  ctx.font = "600 7.5px 'IBM Plex Sans KR', sans-serif";
+  const maxW = bw - av - pad * 3, words = msg.split(' '), lines = [''];
+  for (const w of words) { const t = lines[lines.length - 1] ? lines[lines.length - 1] + ' ' + w : w; if (ctx.measureText(t).width > maxW && lines[lines.length - 1]) { if (lines.length === 2) { lines[1] += '…'; break; } lines.push(w); } else lines[lines.length - 1] = t; }
+  const bh = Math.max(av + pad * 2, lines.length * 9 + pad * 2 + 2);
+  px(bx, by, bw, bh, '#fffaf0'); px(bx, by + bh, bw, 1, 'rgba(0,0,0,.25)');
+  px(RV.door - 3, by + bh, 6, 3, '#fffaf0'); px(RV.door - 1, by + bh + 3, 2, 2, '#fffaf0');
+  const img = CEO_IMG[S.cfg.diff]; if (img && img.complete && img.naturalWidth) ctx.drawImage(img, bx + pad, by + pad, av, av);
+  lines.forEach((ln, i) => text(ln, bx + av + pad * 2, by + pad + 5 + i * 9 + (lines.length === 1 ? (av - 9) / 2 : 0), "600 7.5px 'IBM Plex Sans KR', sans-serif", '#17123a', 'left'));
+}
 function drawPerson(c) {
   const x = Math.round(c.x), y = Math.round(c.y), step = Math.floor(c.ph) % 2;
   ctx.globalAlpha = c.target === 'pass' ? 0.55 : 1;
@@ -913,6 +1153,7 @@ function draw() {
     }
   }
   glowStore(ME, oMe, dark); glowStore(RV, oRv, dark);
+  if (S && S.say && Date.now() - S.say.t < 4500) drawBubble(S.say.text);
   for (const p of VIS.pops) { ctx.globalAlpha = clamp(p.life / 0.7, 0, 1); text(p.me ? '+₩' : '•', p.x, p.y, "600 8px 'IBM Plex Sans KR', sans-serif", p.me ? '#f0b44c' : '#a495ff'); ctx.globalAlpha = 1; }
 }
 
@@ -940,6 +1181,7 @@ const TIPS = {
   emerg: '긴급 운전자금은 월 2.5%다. 잔액이 2,000만을 넘으면 건강도가 크게 깎인다.',
 };
 function store(key, val) { try { if (val === undefined) return JSON.parse(localStorage.getItem(key) || 'null'); localStorage.setItem(key, JSON.stringify(val)); } catch (e) { return null; } }
+hooks.toast = msg => toast(msg);
 hooks.tip = key => { const seen = store('capi.tips') || {}; if (seen[key]) return; seen[key] = 1; store('capi.tips', seen); toast(TIPS[key], 'tip'); };
 hooks.slow = () => { if (speed > 1) { speed = 1; syncSpeed(); toast('경쟁사 공세: 1배속으로 감속했다.'); } };
 function kv(box, pairs) {
@@ -968,6 +1210,7 @@ hooks.banner = row => {
   const from = (row.m - 1) * DPM, to = row.m * DPM;
   for (const it of S.log.filter(x => x.g >= from && x.g <= to).reverse()) { const d = document.createElement('div'); d.className = 'k-' + it.kind; const a = document.createElement('span'); a.textContent = dateLabel(Math.min(it.g, to - 1)); const b = document.createElement('span'); b.textContent = it.text; d.append(a, b); log.append(d); }
   if (!log.children.length) log.textContent = '특별한 일이 없었다.';
+  lastSettleRow = row; resetAi('stAiBtn', 'stAi', '✨ 조언자에게 AI 조언 듣기');
   pauses.add('settle');
   el('settleModal').hidden = false;
   el('stOk').focus({ preventScroll: true });
@@ -1027,6 +1270,10 @@ function updateHUD() {
   el('vsP1').textContent = me.price.toLocaleString('ko-KR'); el('vsP2').textContent = shown.toLocaleString('ko-KR') + (d.infoDelay ? '*' : '');
   el('vsQ1').textContent = me.Q.toFixed(1); el('vsQ2').textContent = rv.Q.toFixed(1);
   el('vsB1').textContent = Math.round(me.B); el('vsB2').textContent = Math.round(rv.B);
+  const ceo = CEO();
+  if (el('rvImg').getAttribute('src') !== ceo.img) el('rvImg').setAttribute('src', ceo.img);
+  el('rvName').textContent = `뉴웨이브 대표 ${ceo.name} · ${ceo.tag}`;
+  el('rvQuote').textContent = S.say ? `“${S.say.text}”` : '';
   el('rvState').textContent = rv.attackLeft > 0 ? `경쟁사: '${rv.label}' 공세 중 · ${rv.attackLeft}일 남음` : rv.retrench ? '경쟁사: 자금난, 공세 중단' : '경쟁사: 관망 중' + (d.infoDelay ? ' · *가격은 하루 늦게 보인다' : '');
   const pend = el('pending'); pend.innerHTML = '';
   for (const p of S.pending) {
@@ -1035,6 +1282,8 @@ function updateHUD() {
     const b = document.createElement('span'); b.className = 'num'; b.textContent = `${p.at - S.g}일 뒤`;
     r.append(a, b); pend.append(r);
   }
+  for (const e of S.effects) { const r = document.createElement('div'); r.className = 'row'; const a = document.createElement('span'); a.textContent = e.label; a.style.color = (e.demand ?? 1) < 1 || (e.cost ?? 1) > 1 || (e.rate ?? 0) > 0 ? 'var(--bad)' : 'var(--good)'; const b = document.createElement('span'); b.className = 'num'; b.textContent = `${e.until - S.g}일 남음`; r.append(a, b); pend.append(r); }
+  if (me.costMod < 1) { const r = document.createElement('div'); r.className = 'row'; r.innerHTML = `<span style="color:var(--good)">자동화 설비 · 원가 −${Math.round((1 - me.costMod) * 100)}%</span><span class="num">영구</span>`; pend.append(r); }
   if (me.supplier !== 1) { const r = document.createElement('div'); r.className = 'row'; r.innerHTML = `<span>원가 ${me.supplier > 1 ? '+8%' : '−5%'}</span><span class="num">${me.supplierUntil - S.g}일 남음</span>`; pend.append(r); }
   // spark
   const days = S.days.slice(-30), sp = el('spark');
@@ -1045,7 +1294,7 @@ function updateHUD() {
   // price card
   el('price').value = me.price;
   el('priceBig').textContent = fmtWon(me.price);
-  const c = unitCost(me.Q) * me.supplier;
+  const c = unitCost(me.Q) * me.supplier * me.costMod * (me.locked ? effMul('cost', e => e.key !== 'rawUp' && e.key !== 'fxUp') : effMul('cost'));
   el('priceSub').textContent = `원가 ${fmtWon(c)} · 마진 ${pct((me.price - c) / me.price)}`;
   const qp = S.pending.find(p => p.who === 'me' && p.kind === 'q'), mp = S.pending.find(p => p.who === 'me' && p.kind === 'mkt');
   el('qNote').textContent = qp ? `진행 중 · ${qp.at - S.g}일 뒤 효과` : `품질 +1 · ${d.delay}일 뒤 효과 · 원가 +500원`;
@@ -1218,6 +1467,58 @@ function renderLedger() {
   for (const it of [...S.log].reverse()) { const d = document.createElement('div'); d.className = 'k-' + it.kind; const a = document.createElement('span'); a.textContent = dateLabel(it.g); const b = document.createElement('span'); b.textContent = it.text; d.append(a, b); log.append(d); }
 }
 
+/* ---------- AI 조언 (서버 /api/advisor → OpenAI) ---------- */
+async function askAdvisor(kind, data) {
+  const ctrl = new AbortController(), timer = setTimeout(() => ctrl.abort(), 25000);
+  try {
+    const res = await fetch('/api/advisor', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind, advisor: S.cfg.adv, data }), signal: ctrl.signal });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok || !body.text) throw new Error(body.error || `HTTP ${res.status}`);
+    return body.text;
+  } finally { clearTimeout(timer); }
+}
+function monthPayload(row) {
+  const from = (row.m - 1) * DPM, to = row.m * DPM;
+  return {
+    difficulty: DIFF[S.cfg.diff].name, contract: CONTRACTS[S.cfg.contract].name, rival: `뉴웨이브 상사(대표 ${CEO().name})`,
+    month: row.m, phase: PHASES[row.phase].name, nextPhase: PHASES[row.next].name,
+    revenue_man: man(row.rev), variableCost_man: man(row.var), fixedCost_man: man(row.fixed), interest_man: man(row.interest), invest_man: man(row.invest),
+    operatingProfit_man: man(row.op), cash_man: man(row.cash), netWorth_man: man(row.capital), debt_man: man(row.debt),
+    share: Math.round(row.share * 100), prevShare: S.months[row.m - 2] ? Math.round(S.months[row.m - 2].share * 100) : null,
+    myAvgPrice: Math.round(row.price), rivalAvgPrice: Math.round(row.rp), myQuality: +row.Q.toFixed(1), rivalQuality: +row.rvQ.toFixed(1), myBrand: Math.round(row.B), rivalBrand: Math.round(row.rvB),
+    health: Math.round(row.health), healthDelta: row.dh, emergencyLoan: row.emerg, creditGrade: CREDIT[S.me.credit].g,
+    events: S.log.filter(x => x.g >= from && x.g <= to).map(x => x.text).slice(-12),
+  };
+}
+function finalPayload(r) {
+  return {
+    difficulty: DIFF[S.cfg.diff].name, contract: CONTRACTS[S.cfg.contract].name, contractOk: r.contractOk, rival: `뉴웨이브 상사(대표 ${CEO().name})`,
+    result: S.ended === 'clear' ? '12개월 생존' : S.ended === 'health' ? '파산(건강도 0)' : '파산(순자산 4개월 연속 음수)', grade: r.grade,
+    startCash_man: man(S.startCash), finalNetWorth_man: man(r.capital), companyValue_man: man(r.value), avgShare: Math.round(r.shareAvg * 100),
+    months: S.months.map(x => ({ m: x.m, phase: PHASES[x.phase].name, op_man: man(x.op), netWorth_man: man(x.capital), share: Math.round(x.share * 100), price: Math.round(x.price), rivalPrice: Math.round(x.rp), health: Math.round(x.health) })),
+    attacks: S.attacks.length, decisions: S.decisions.slice(-20).map(x => `${dateLabel(x.g)} ${x.text}`),
+  };
+}
+function wireAi(btnId, boxId, getPayload, kind, fallback) {
+  el(btnId).addEventListener('click', async () => {
+    const btn = el(btnId), box = el(boxId);
+    btn.disabled = true; btn.textContent = '조언자가 생각하는 중…';
+    box.hidden = false; box.className = 'ai-text'; box.textContent = '';
+    try {
+      box.textContent = `${ADVISORS[S.cfg.adv].name}: ${await askAdvisor(kind, getPayload())}`;
+      btn.hidden = true;
+    } catch (e) {
+      box.className = 'ai-text err';
+      box.textContent = (String(e.message).includes('NO_KEY') ? 'AI 키가 설정되지 않았다 (서버 환경변수 OPENAI_API_KEY). ' : 'AI 조언을 불러오지 못했다. ') + '대신 기본 브리핑: ' + fallback();
+      btn.disabled = false; btn.textContent = '✨ 다시 시도';
+    }
+  });
+}
+let lastSettleRow = null;
+wireAi('stAiBtn', 'stAi', () => monthPayload(lastSettleRow), 'month', () => `${lastSettleRow.m}월 영업이익 ${fmtS(lastSettleRow.op)}, 점유율 ${pct(lastSettleRow.share)}. 장부에서 지난달과 나란히 비교해 보자.`);
+wireAi('rpAiBtn', 'rpAi', () => finalPayload(evaluate()), 'final', () => el('rpBrief').textContent);
+function resetAi(btnId, boxId, label) { const b = el(btnId); b.hidden = false; b.disabled = false; b.textContent = label; el(boxId).hidden = true; el(boxId).textContent = ''; }
+
 /* ---------- 결과 리포트 ---------- */
 function showReport() {
   const r = evaluate(), me = S.me, months = S.months;
@@ -1244,6 +1545,8 @@ function showReport() {
   if (firstInv) facts.push(`첫 투자 시점: ${dateLabel(firstInv.g)} (${firstInv.text}).`);
   const ul = el('rpFacts'); ul.innerHTML = ''; facts.forEach(f => { const li = document.createElement('li'); li.textContent = f; ul.append(li); });
   el('rpBrief').textContent = briefing(r, attD, calm, mg);
+  el('rpRivalImg').src = CEO().img; el('rpRivalName').textContent = `뉴웨이브 대표 ${CEO().name}`;
+  el('rpRivalQuote').textContent = S.say ? `“${S.say.text}”` : '';
   // compare
   const prev = store('capi.lastRun');
   const cur = { grade: r.grade, months: endM, capital: r.capital, share: r.shareAvg, diff: DIFF[S.cfg.diff].name, seed: S.cfg.seed };
@@ -1255,6 +1558,7 @@ function showReport() {
     rowsC.forEach((rw, i) => rw.forEach(c => { const s = document.createElement('span'); s.textContent = c; if (i === 0 || rw[0] === c) s.className = 'h'; cmp.append(s); }));
   } else cw.hidden = true;
   store('capi.lastRun', cur);
+  resetAi('rpAiBtn', 'rpAi', '✨ 조언자에게 AI 총평 듣기');
   el('report').hidden = false;
 }
 
@@ -1315,6 +1619,14 @@ function buildOpts(boxId, src, key, sub) {
   }
 }
 buildOpts('optDiff', DIFF, 'diff');
+function renderRivalPreview() {
+  const c = RIVAL_CEO[pick.diff] || RIVAL_CEO.basic, box = el('rvPreview'); box.innerHTML = '';
+  const im = document.createElement('img'); im.src = c.img; im.alt = ''; im.width = 32; im.height = 32;
+  const t = document.createElement('span'); t.textContent = `상대: 뉴웨이브 상사 대표 ${c.name} — ${c.tag}. “${c.lines.start[0]}”`;
+  box.append(im, t);
+}
+el('optDiff').addEventListener('click', () => setTimeout(renderRivalPreview, 0));
+renderRivalPreview();
 buildOpts('optAdv', ADVISORS, 'adv', 'role');
 (() => {
   const box = el('optCon'); box.innerHTML = '';
