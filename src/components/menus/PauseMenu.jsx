@@ -46,7 +46,7 @@ export default function PauseMenu() {
   return (
     <div className="cr2-pause-overlay">
       <div className="cr2-pause-menu">
-        <div className="cr2-pause-title">CapiRogue</div>
+        <div className="cr2-pause-title">CapiReal</div>
         <div className="cr2-pause-floor">Floor {gameState.floor} / 120</div>
 
         <div className="cr2-pause-divider" />

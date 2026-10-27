@@ -39,12 +39,8 @@ export default function TitleScreen() {
     <div className="cr2-title-screen">
       <div className="cr2-title-bg" />
 
-      <img
-        src="/assets/logo_image-f7z3e97D.png"
-        alt="CapiRogue"
-        className="cr2-title-logo-img"
-      />
-      <div className="cr2-title-version">v1.0.0</div>
+      <div className="cr2-title-logo">CapiReal</div>
+      <div className="cr2-title-version">v2.0 · 멀티 시장</div>
       <div className="cr2-title-tagline">시장을 지배하라</div>
 
       <div className="cr2-title-menu">

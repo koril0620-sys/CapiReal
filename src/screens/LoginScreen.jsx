@@ -76,7 +76,7 @@ export default function LoginScreen() {
 
   return (
     <div className="cr2-login-screen">
-      <div className="cr2-login-logo">CapiRogue</div>
+      <div className="cr2-login-logo">CapiReal</div>
 
       <div className="cr2-login-card">
         <div className="cr2-login-title">
