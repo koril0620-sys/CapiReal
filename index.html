@@ -127,6 +127,11 @@ input[type=range]{width:100%;accent-color:var(--me)}
 .row-end{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;align-items:center}
 .hero-sub{color:var(--muted);margin:0;max-width:62ch}
 .seed{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg-toggle{display:inline-flex;gap:0}
+.seg-toggle button{border-radius:0;padding:6px 12px;font-size:13px}
+.seg-toggle button:first-child{border-radius:8px 0 0 8px}
+.seg-toggle button:last-child{border-radius:0 8px 8px 0;border-left:0}
+.seg-toggle button[aria-pressed="true"]{background:var(--me-soft);border-color:var(--me);color:var(--me)}
 .seed input{width:120px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:6px 8px;color:var(--fg);font-family:var(--mono)}
 .timer{height:5px;border-radius:3px;background:var(--panel-2);overflow:hidden}
 .timer i{display:block;height:100%;background:var(--bad)}
@@ -323,7 +328,7 @@ footer{color:var(--muted);font-size:12px;max-width:1180px;margin:4px auto 0}
   <div class="sheet">
     <div>
       <h2>캐피로그 · 실시간 상점가</h2>
-      <p class="hero-sub">같은 거리의 경쟁사 뉴웨이브 상사와 12개월을 버틴다. 가격·품질·브랜드를 바꾸면 손님 흐름이 바로 달라지고, 투자 효과는 몇 주 뒤에 도착한다. 4월과 7~8월에는 새 경쟁사가 거리에 들어오고, 문을 닫는 가게 자리에는 더 강한 가게가 들어온다. 어떤 전략이 맞는지는 알려주지 않는다.</p>
+      <p class="hero-sub">같은 거리의 경쟁사 뉴웨이브 상사와 12개월을 버틴다. 가격·품질·브랜드를 바꾸면 손님 흐름이 바로 달라지고, 투자 효과는 몇 주 뒤에 도착한다. 몇 달 뒤부터 새 경쟁사가 거리에 들어오고, 문을 닫는 가게 자리에는 더 강한 가게가 들어온다. 어떤 전략이 맞는지는 알려주지 않는다.</p>
     </div>
     <div><h4>난도</h4><div class="opts" id="optDiff"></div><div class="rv-preview" id="rvPreview"></div></div>
     <div><h4>시작 투자 포인트 · 10점</h4>
@@ -336,7 +341,11 @@ footer{color:var(--muted);font-size:12px;max-width:1180px;margin:4px auto 0}
     <div><h4>조언자</h4><div class="opts" id="optAdv"></div></div>
     <div><h4>경영 계약 (선택)</h4><div class="opts" id="optCon"></div></div>
     <div class="row-end" style="justify-content:space-between">
-      <div class="seed"><label for="seedIn" class="note">시장 번호(시드)</label><input id="seedIn" inputmode="numeric" value="1024"><button class="ghost" type="button" id="seedRnd">무작위</button></div>
+      <div class="seed">
+        <div class="seg-toggle" role="group" aria-label="시장 고르기"><button type="button" class="ghost" id="mkNum" aria-pressed="true">번호로 고르기</button><button type="button" class="ghost" id="mkRand" aria-pressed="false">랜덤 시장</button></div>
+        <span id="seedNumBox" class="seed"><label for="seedIn" class="note">시장 번호(시드)</label><input id="seedIn" inputmode="numeric" value="1024"><button class="ghost" type="button" id="seedRnd">무작위</button></span>
+        <span id="seedRandNote" class="note" hidden>시작할 때 새 시장이 뽑힌다. 끝나면 번호를 알려 준다.</span>
+      </div>
       <button class="primary" type="button" id="btnStart">영업 시작</button>
     </div>
   </div>
@@ -350,7 +359,7 @@ footer{color:var(--muted);font-size:12px;max-width:1180px;margin:4px auto 0}
       <li><b>판매가</b>는 슬라이더나 <kbd>←</kbd><kbd>→</kbd>로 바꾼다. 손님이 어느 가게로 들어가는지가 곧 점유율이다.</li>
       <li><b>투자</b>는 돈이 바로 나가고 효과는 나중에 온다. 품질·마케팅 말고도 직원 교육·원가 절감 설비·리모델링·단골 멤버십이 있다. <b>대출</b>은 월말에 이자를 낸다.</li>
       <li>손님은 <b>알뜰형·품질형·유행형·단골·보통</b> 다섯 유형이 있고(옷 색으로 구분), 유형마다 보는 것이 달라 직접 가게를 고른다. 들어갔다가 안 사고 나오는 손님도 있다. 불황엔 알뜰형이, 호황엔 품질·유행형이 늘어난다.</li>
-      <li>4월과 7~8월에 <b>새 경쟁사</b>가 들어와 거리가 3~4곳의 싸움이 된다. 경쟁사가 문을 닫으면 그 자리에 더 강한 가게가 들어온다.</li>
+      <li>3~5월쯤, 그리고 그 3~4달 뒤에 <b>새 경쟁사</b>가 들어와 거리가 3~4곳의 싸움이 된다. 경쟁사가 문을 닫으면 그 자리에 더 강한 가게가 들어온다.</li>
       <li>월말마다 결산 화면이 뜨고 시간이 멈춘다. 확인을 눌러야 다음 달로 넘어간다. 건강도 0이 되거나 순자산이 4개월 연속 음수면 끝난다.</li>
       <li><kbd>Space</kbd>로 멈추고, <b>장부</b>에서 지난 기록을 본다. 공략은 직접 찾아야 한다.</li>
     </ul>
@@ -401,7 +410,7 @@ footer{color:var(--muted);font-size:12px;max-width:1180px;margin:4px auto 0}
     <div class="brief" id="rpBrief"></div>
     <div class="ai-box"><button class="ghost" type="button" id="rpAiBtn">✨ 조언자에게 AI 총평 듣기</button><div class="ai-text" id="rpAi" hidden></div></div>
     <div id="rpCompareWrap"><h4>지난 판과 비교</h4><div class="compare" id="rpCompare"></div></div>
-    <div class="row-end"><button class="ghost" type="button" id="rpLedger">장부 보기</button><button class="ghost" type="button" id="rpNew">조건 바꿔 새 판</button><button class="primary" type="button" id="rpRetry">같은 시장에서 다시</button></div>
+    <div class="row-end"><button class="ghost" type="button" id="rpLedger">장부 보기</button><button class="ghost" type="button" id="rpNew">조건 바꿔 새 판</button><button class="ghost" type="button" id="rpRandom">새 랜덤 시장</button><button class="primary" type="button" id="rpRetry">같은 시장에서 다시</button></div>
   </div>
 </div>
 <div id="toast" aria-live="polite"></div>
@@ -743,6 +752,13 @@ function rand4() {
   t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
+// 시장 설정 전용 난수 (뉴웨이브 능력치·정기 이벤트 날짜·경쟁사 입점 시기)
+function rand5() {
+  let a = S.rs5 = (S.rs5 + 0x6D2B79F5) | 0;
+  let t = Math.imul(a ^ (a >>> 15), 1 | a);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
 // 지금 거리 손님 구성 (경기 + 외부 충격)
 function segMix() {
   const w = SEGS.map(sg => Math.max(0.02, SEG_MIX[sg.key][S.phase] + S.effects.reduce((a, e) => a + ((e.mix && e.mix[sg.key]) || 0), 0)));
@@ -827,26 +843,34 @@ function newGame(cfg) {
     rivals: [], gone: [], nextId: 1, tier: 1, entries: [],
     pending: [], mon: blankMon(), months: [], days: [], log: [], decisions: [], attacks: [], event: null,
     shownRp: 12000, lastLoggedPrice: 12000, ended: null, forced: {}, sched: [], startCash: Math.round(30000000 * d.cash),
-    rs2: (((cfg.seed >>> 0) || 1) ^ 0x9E3779B9) | 0, rs3: (((cfg.seed >>> 0) || 1) ^ 0x51ED270B) | 0, rs4: (((cfg.seed >>> 0) || 1) ^ 0x2545F491) | 0, effects: [], say: null,
+    rs2: (((cfg.seed >>> 0) || 1) ^ 0x9E3779B9) | 0, rs3: (((cfg.seed >>> 0) || 1) ^ 0x51ED270B) | 0, rs4: (((cfg.seed >>> 0) || 1) ^ 0x2545F491) | 0, rs5: (((cfg.seed >>> 0) || 1) ^ 0x7F4A7C15) | 0, effects: [], say: null,
     carry: {}, buyCarry: {}, dayU: { me: 0, all: 0 },
   };
-  S.main = mkRival({ name: '뉴웨이브', key: 'newwave', style: 'main', colors: MAIN_COLORS, ceo: CEO(), base: 12000, floor: 10500, cap: 14500, Q: 5, B: 30, cash: 45000000, openedAt: 0, loyal: 0.5 });
+  // 예전엔 고정이던 것들도 시장 번호에 따라 정한다: 뉴웨이브 첫 능력치, 정기 이벤트 날짜, 새 경쟁사 시기
+  const r5 = (a, b) => a + Math.floor(rand5() * (b - a + 1));
+  const nwBase = r5(116, 124) * 100;
+  S.main = mkRival({ name: '뉴웨이브', key: 'newwave', style: 'main', colors: MAIN_COLORS, ceo: CEO(), base: nwBase, floor: nwBase - 1500, cap: nwBase + 2500,
+    Q: r5(45, 55) / 10, B: r5(25, 35), cash: r5(40, 50) * 1000000, openedAt: 0, loyal: 0.5 });
+  S.shownRp = nwBase;
+  const firstOpen = r5(3, 5), secondOpen = Math.min(10, firstOpen + r5(3, 4));   // 새 경쟁사 개업 달
+  S.entryMonths = [firstOpen, secondOpen];
+  const supplierG = (r5(2, 4) - 1) * DPM + r5(1, 3), festivalG = (r5(7, 10) - 1) * DPM + r5(1, 3);
   S.rivals.push(S.main);
   // 새 경쟁사가 들어오는 차례와 시기: 4월 초, 7~8월 초 (시드로 정해짐)
   S.entrantPool = [...ENTRANTS];
   for (let i = S.entrantPool.length - 1; i > 0; i--) { const j = Math.floor(rand3() * (i + 1)); [S.entrantPool[i], S.entrantPool[j]] = [S.entrantPool[j], S.entrantPool[i]]; }
-  S.sched.push({ g: 3 * DPM - 3, kind: 'construct', slot: null });
-  S.sched.push({ g: (rand3() < 0.5 ? 6 : 7) * DPM - 3, kind: 'construct', slot: null });
+  S.sched.push({ g: (firstOpen - 1) * DPM - 3, kind: 'construct', slot: null });
+  S.sched.push({ g: (secondOpen - 1) * DPM - 3, kind: 'construct', slot: null });
   const chain = 5 + Math.floor(rand() * 2);
   S.chainMonth = chain;
   S.sched.push({ g: (chain - 1) * DPM, kind: 'chainAttack' });
   S.forced[chain + 1] = 3;
-  S.sched.push({ g: 2 * DPM + 1, kind: 'pevent', key: 'supplier' });
-  S.sched.push({ g: 8 * DPM + 2, kind: 'pevent', key: 'festival' });
+  S.sched.push({ g: supplierG, kind: 'pevent', key: 'supplier' });
+  S.sched.push({ g: festivalG, kind: 'pevent', key: 'festival' });
   const rm = rand() < 0.5 ? 4 : 10; S.sched.push({ g: (rm - 1) * DPM + Math.floor(rand() * DPM), kind: 'review' });
   const mm = rand() < 0.5 ? 2 : 11; S.sched.push({ g: (mm - 1) * DPM + Math.floor(rand() * DPM), kind: 'material' });
   scheduleExtraEvents();
-  news(`시장 ${cfg.seed}번에서 영업을 시작했다. 같은 거리에 경쟁사 뉴웨이브 상사(대표 ${CEO().name})가 있다. 몇 달 뒤에는 새 가게들도 들어온다.`);
+  news(`${cfg.randomMarket ? '랜덤으로 뽑힌 ' : ''}시장 ${cfg.seed}번에서 영업을 시작했다. 같은 거리에 경쟁사 뉴웨이브 상사(대표 ${CEO().name}, 품질 ${S.main.Q.toFixed(1)} · 브랜드 ${S.main.B} · ${fmtWon(nwBase)})가 있다. 몇 달 뒤에는 새 가게들도 들어온다.`);
   rivalSay('start', S.main);
 }
 
@@ -1937,7 +1961,7 @@ function showReport() {
   el('rpGrade').textContent = r.grade;
   el('rpGrade').style.color = r.clear ? 'var(--me)' : 'var(--bad)';
   el('rpTitle').textContent = titles[S.ended];
-  el('rpSub').textContent = `${DIFF[S.cfg.diff].name} · 시장 ${S.cfg.seed}번 · 최종 순자산 ${fmtM(r.capital)} · 기업가치 ${fmtM(r.value)} (시작 ${fmtM(S.startCash)})` + (S.cfg.contract !== 'none' ? ` · 계약 '${CONTRACTS[S.cfg.contract].name}' ${r.contractOk ? '성공' : '실패'}` : '');
+  el('rpSub').textContent = `${DIFF[S.cfg.diff].name} · ${S.cfg.randomMarket ? `랜덤 시장(${S.cfg.seed}번 — 번호로 고르기에 입력하면 다시 할 수 있다)` : `시장 ${S.cfg.seed}번`} · 최종 순자산 ${fmtM(r.capital)} · 기업가치 ${fmtM(r.value)} (시작 ${fmtM(S.startCash)})` + (S.cfg.contract !== 'none' ? ` · 계약 '${CONTRACTS[S.cfg.contract].name}' ${r.contractOk ? '성공' : '실패'}` : '');
   drawChart();
   // facts
   const facts = [];
@@ -2043,7 +2067,7 @@ buildOpts('optDiff', DIFF, 'diff');
 function renderRivalPreview() {
   const c = RIVAL_CEO[pick.diff] || RIVAL_CEO.basic, box = el('rvPreview'); box.innerHTML = '';
   const im = document.createElement('img'); im.src = c.img; im.alt = ''; im.width = 32; im.height = 32;
-  const t = document.createElement('span'); t.textContent = `첫 상대: 뉴웨이브 상사 대표 ${c.name} — ${c.tag}. “${c.lines.start[0]}” (4월부터 새 경쟁사가 하나씩 들어온다)`;
+  const t = document.createElement('span'); t.textContent = `첫 상대: 뉴웨이브 상사 대표 ${c.name} — ${c.tag}. “${c.lines.start[0]}” (3~5월쯤부터 새 경쟁사가 하나씩 들어온다. 뉴웨이브 능력치와 시기는 시장마다 다르다)`;
   box.append(im, t);
 }
 el('optDiff').addEventListener('click', () => setTimeout(renderRivalPreview, 0));
@@ -2090,10 +2114,20 @@ function begin(cfg) {
   const guided = store('capi.guided');
   if (!guided) { pauses.add('guide'); el('guide').hidden = false; }
 }
+const randomSeed = () => 10000 + Math.floor(Math.random() * 90000);
+let seedMode = store('capi.seedMode') || 'num';
+function syncSeedMode() {
+  el('mkNum').setAttribute('aria-pressed', String(seedMode === 'num')); el('mkRand').setAttribute('aria-pressed', String(seedMode === 'rand'));
+  el('seedNumBox').hidden = seedMode !== 'num'; el('seedRandNote').hidden = seedMode !== 'rand';
+}
+el('mkNum').addEventListener('click', () => { seedMode = 'num'; store('capi.seedMode', seedMode); syncSeedMode(); });
+el('mkRand').addEventListener('click', () => { seedMode = 'rand'; store('capi.seedMode', seedMode); syncSeedMode(); });
+syncSeedMode();
 el('btnStart').addEventListener('click', () => {
-  const seed = parseInt(el('seedIn').value, 10) || 1024;
-  begin({ diff: pick.diff, adv: pick.adv, contract: pick.contract, seed, alloc: { ...pick.alloc } });
+  const rnd = seedMode === 'rand', seed = rnd ? randomSeed() : (parseInt(el('seedIn').value, 10) || 1024);
+  begin({ diff: pick.diff, adv: pick.adv, contract: pick.contract, seed, randomMarket: rnd, alloc: { ...pick.alloc } });
 });
+el('rpRandom').addEventListener('click', () => begin({ ...S.cfg, seed: randomSeed(), randomMarket: true }));
 el('guideOk').addEventListener('click', () => { store('capi.guided', 1); el('guide').hidden = true; pauses.delete('guide'); });
 el('rpRetry').addEventListener('click', () => begin({ ...S.cfg }));
 el('rpNew').addEventListener('click', () => { el('report').hidden = true; el('startScreen').hidden = false; pauses.add('start'); });
@@ -2156,7 +2190,7 @@ window.addEventListener('pointerdown', unlockAudio, { capture: true });
 window.addEventListener('keydown', unlockAudio, { capture: true });
 
 // 버튼 효과음: 진행 버튼은 '다음', 나머지는 '클릭'
-const NEXT_BUTTONS = new Set(['btnStart', 'stOk', 'rpRetry', 'guideOk']);
+const NEXT_BUTTONS = new Set(['btnStart', 'stOk', 'rpRetry', 'rpRandom', 'guideOk']);
 document.addEventListener('click', e => {
   const b = e.target.closest('button');
   if (!b || b.disabled || b.closest('#soundPanel')) return;
