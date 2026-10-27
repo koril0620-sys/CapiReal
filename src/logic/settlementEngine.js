@@ -131,6 +131,30 @@ function simulateMarket(state, market, ctx) {
   }
 }
 
+// 정산 전 미리보기: 지금 전략이면 이번 달 손님이 어디로 갈지 (무작위 요소는 중간값)
+// 실시간 거리 화면에서 사용
+export function previewMarket(state, market) {
+  const primary = getPrimaryMarket(state)
+  const sim = simulateMarket(
+    state,
+    { ...market, isPrimary: primary?.tierId === market.tierId },
+    {
+      costEffect: getCostEffectMultiplier(state.activeEffects || []),
+      bossCounter: false,
+      random: () => 0.5,
+    },
+  )
+  return {
+    tierId: market.tierId,
+    shares: sim.shares,
+    groupShares: sim.groupShares,
+    consumerRatio: sim.consumerRatio,
+    totalDemand: sim.totalDemand,
+    price: sim.price,
+    rivalPrices: Object.fromEntries(market.rivals.map((rival, index) => [rival.id, sim.rivalPlans[index].price])),
+  }
+}
+
 export function settle(gameState, options = {}) {
   const random = options.random || Math.random
   const now = options.now ?? Date.now()

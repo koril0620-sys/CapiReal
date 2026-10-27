@@ -445,3 +445,57 @@
 .cr2-event-pick-desc { font-size: 10px; color: var(--cr2-gray); line-height: 1.5; }
 .cr2-event-amplify { margin-top: 6px; font-size: 10px; color: var(--cr2-gold); }
 .cr2-rival-tab .cr2-panel-title { padding-right: 44px; }
+
+/* 실시간 시장 거리 */
+.cr2-street {
+  position: absolute;
+  left: 124px;
+  right: 8px;
+  bottom: 6px;
+  height: 190px;
+  z-index: 5;
+  pointer-events: none;
+}
+.cr2-street-canvas {
+  position: absolute;
+  inset: 0;
+  image-rendering: pixelated;
+}
+.cr2-street-head {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  font-size: 8px;
+  color: var(--cr2-gray);
+}
+.cr2-street-title {
+  font-family: 'Press Start 2P', 'Noto Sans KR', monospace;
+  font-size: 8px;
+  color: var(--cr2-lime);
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(0, 170, 0, 0.5);
+}
+.cr2-street-title::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 5px;
+  background: var(--cr2-red);
+  animation: cr2-blink 1.2s infinite;
+}
+.cr2-street-legend {
+  display: flex;
+  gap: 6px;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.7);
+}
+.cr2-street-legend span { display: inline-flex; align-items: center; gap: 3px; }
+.cr2-street-legend i { display: inline-block; width: 6px; height: 8px; }

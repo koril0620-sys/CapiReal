@@ -19,6 +19,9 @@ export default function MarketBoard({ onSelect }) {
   const compact = sorted.length >= 4
   const phaseMultiplier = (ECO_PHASES[econPhase] || ECO_PHASES.stable).demandMultiplier
 
+  // 시장이 하나뿐이면 거리 화면만으로 충분하니 숨긴다
+  if (sorted.length <= 1) return null
+
   return (
     <div className={`cr2-market-board ${compact ? 'cr2-market-board-compact' : ''}`}>
       <div className="cr2-market-board-head">
