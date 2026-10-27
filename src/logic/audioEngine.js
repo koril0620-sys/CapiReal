@@ -24,6 +24,25 @@ const SFX_FILES = {
 
 let currentBGM = null
 let currentBGMKey = null
+let audioUnlocked = false
+
+// 브라우저는 사용자가 한 번 클릭하기 전까지 소리 재생을 막는다.
+// 첫 클릭/키 입력 때 막혀 있던 BGM을 다시 틀어준다.
+function unlockAudio() {
+  if (audioUnlocked) return
+  audioUnlocked = true
+  if (currentBGM && currentBGM.paused && bgmEnabled) {
+    currentBGM.volume = bgmVolume
+    currentBGM.play().catch(() => {})
+  }
+  window.removeEventListener('pointerdown', unlockAudio)
+  window.removeEventListener('keydown', unlockAudio)
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('pointerdown', unlockAudio)
+  window.addEventListener('keydown', unlockAudio)
+}
 let bgmVolume = 1.0
 let sfxVolume = 1.0
 let bgmEnabled = true
@@ -73,7 +92,10 @@ function startBGM(src, key, volume, fade = false) {
   audio.loop = true
   const targetVolume = volume !== null ? volume : bgmVolume
   audio.volume = fade ? 0 : targetVolume
-  audio.play().catch(error => console.warn('BGM 재생 실패:', error))
+  audio.play().catch(error => {
+    // 클릭 전 자동재생 차단은 정상 — unlockAudio가 첫 클릭 때 다시 재생
+    if (error?.name !== 'NotAllowedError') console.warn('BGM 재생 실패:', error)
+  })
   if (fade) fadeIn(audio, targetVolume)
   currentBGM = audio
   currentBGMKey = key
