@@ -187,6 +187,11 @@ footer{color:var(--muted);font-size:12px;max-width:1180px;margin:4px auto 0}
 .inv-grid .btn span{font-size:12.5px}
 .inv-grid .btn small{font-size:11px;line-height:1.35}
 .rv-state{display:grid;gap:2px}
+.segs{display:grid;grid-template-columns:auto 1fr auto auto;gap:3px 10px;font-size:12.5px;align-items:center}
+.segs .h{color:var(--muted);font-size:11.5px}
+.segs i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:0}
+.seg-bar{height:6px;border-radius:3px;background:var(--panel-2);overflow:hidden}
+.seg-bar b{display:block;height:100%;background:var(--me)}
 .alloc{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
 .alloc-row{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
 .alloc-row b{display:block;font-size:14px}
@@ -290,6 +295,12 @@ footer{color:var(--muted);font-size:12px;max-width:1180px;margin:4px auto 0}
         <div class="note" id="healthNote">월말 예상 변화 +4</div>
       </div>
       <div class="card">
+        <h3>손님 · 이번 달</h3>
+        <div class="note" id="custFlow" style="color:var(--fg)">아직 손님이 없다.</div>
+        <div class="segs" id="segTable"></div>
+        <div class="note">옷 색 = 손님 유형 · 봉투를 든 손님은 산 손님, 빈손으로 나오면 구경만 한 손님</div>
+      </div>
+      <div class="card">
         <div class="rv-ceo">
           <img id="rvImg" alt="" width="40" height="40">
           <div><b id="rvName">뉴웨이브 대표</b><div class="rv-quote" id="rvQuote"></div></div>
@@ -338,6 +349,7 @@ footer{color:var(--muted);font-size:12px;max-width:1180px;margin:4px auto 0}
       <li>하루는 1배속에서 8초(낮 4초, 밤 4초), 한 달은 영업일 5일이다. 밤에도 장사는 계속된다.</li>
       <li><b>판매가</b>는 슬라이더나 <kbd>←</kbd><kbd>→</kbd>로 바꾼다. 손님이 어느 가게로 들어가는지가 곧 점유율이다.</li>
       <li><b>투자</b>는 돈이 바로 나가고 효과는 나중에 온다. 품질·마케팅 말고도 직원 교육·원가 절감 설비·리모델링·단골 멤버십이 있다. <b>대출</b>은 월말에 이자를 낸다.</li>
+      <li>손님은 <b>알뜰형·품질형·유행형·단골·보통</b> 다섯 유형이 있고(옷 색으로 구분), 유형마다 보는 것이 달라 직접 가게를 고른다. 들어갔다가 안 사고 나오는 손님도 있다. 불황엔 알뜰형이, 호황엔 품질·유행형이 늘어난다.</li>
       <li>4월과 7~8월에 <b>새 경쟁사</b>가 들어와 거리가 3~4곳의 싸움이 된다. 경쟁사가 문을 닫으면 그 자리에 더 강한 가게가 들어온다.</li>
       <li>월말마다 결산 화면이 뜨고 시간이 멈춘다. 확인을 눌러야 다음 달로 넘어간다. 건강도 0이 되거나 순자산이 4개월 연속 음수면 끝난다.</li>
       <li><kbd>Space</kbd>로 멈추고, <b>장부</b>에서 지난 기록을 본다. 공략은 직접 찾아야 한다.</li>
@@ -364,6 +376,7 @@ footer{color:var(--muted);font-size:12px;max-width:1180px;margin:4px auto 0}
       <div><h4>이번 달 손익</h4><div class="kv" id="stPL"></div></div>
       <div><h4>회사 상태</h4><div class="kv" id="stState"></div></div>
     </div>
+    <div><h4>손님 분석</h4><div class="settle-grid"><div class="kv" id="stCust"></div><div class="segs" id="stSeg"></div></div></div>
     <div class="contract-box" id="stContract"></div>
     <div><h4>이번 달에 있었던 일</h4><div class="log" id="stLog" style="max-height:170px"></div></div>
     <div class="ai-box"><button class="ghost" type="button" id="stAiBtn">✨ 조언자에게 AI 조언 듣기</button><div class="ai-text" id="stAi" hidden></div></div>
@@ -548,6 +561,26 @@ for (const e of ENTRANTS) { try { ENTRANT_IMG[e.key] = makeFace(e.face); } catch
 const MAIN_COLORS = { wall: '#3b3a68', wallLine: 'rgba(255,255,255,.05)', trim: '#252447', sign: '#a495ff', signText: '#17123a', glass: '#cfc6ff' };
 const MAX_RIVALS = 3;                                   // 내 가게 포함 최대 4곳
 const marketSize = n => 1 + 0.5 * (n - 2);            // 가게가 늘면 거리 손님도 는다 (가게당 몫은 같고, 더 강한 가게와 나눠야 한다)
+/* 손님 유형: 유형마다 가격·품질·브랜드를 보는 정도가 다르다. 경기에 따라 거리 손님 구성이 바뀐다 */
+const SEGS = [
+  { key: 'thrift',  name: '알뜰형', color: '#58b07a', desc: '가격에 아주 예민', elasMul: 1.6, qExp: 0.4, bMul: 0.5, focus: 'cheap' },
+  { key: 'quality', name: '품질형', color: '#4a8ad9', desc: '품질을 크게 봄', elasMul: 0.6, qExp: 1.6, bMul: 1, focus: 'premium' },
+  { key: 'trend',   name: '유행형', color: '#d07aa0', desc: '브랜드·광고에 끌림', elasMul: 1.0, qExp: 0.5, bMul: 2, focus: 'ad' },
+  { key: 'loyal',   name: '단골',   color: '#c9a64a', desc: '다니던 가게로 감', loyal: true },
+  { key: 'normal',  name: '보통',   color: '#e0e0e0', desc: '두루 따짐', elasMul: 1.0, qExp: 0.8, bMul: 1 },
+];
+//                 호황   성장   평시   위축   불황
+const SEG_MIX = {
+  thrift:  [0.20, 0.25, 0.30, 0.38, 0.45],
+  quality: [0.26, 0.23, 0.20, 0.16, 0.12],
+  trend:   [0.26, 0.23, 0.20, 0.16, 0.13],
+  loyal:   [0.13, 0.14, 0.15, 0.15, 0.15],
+  normal:  [0.15, 0.15, 0.15, 0.15, 0.15],
+};
+const TRAFFIC = [1.12, 1.05, 1.00, 0.94, 0.88];   // ① 거리에 나오는 사람
+const CONV    = [1.05, 1.03, 1.00, 0.95, 0.90];   // ② 들어가서 사는 비율
+const BASKET  = [1.25, 1.10, 1.00, 0.86, 0.74].map((d, i) => d / (TRAFFIC[i] * CONV[i]));   // ③ 1인당 구매량 (①×②×③ = 경기 배율)
+const CONV_BASE = 0.65;                            // 평시 기준 구매율
 const relShare = (share, n) => share * n / 2;           // 공정 몫(1/n)을 50%로 맞춘 점유율 (기존 기준과 비교용)
 const ALLOC_Q = 0.1, ALLOC_B = 1.5;                    // 시작 포인트 1점의 효과
 
@@ -674,11 +707,11 @@ const SHOCKS = {
   fxUp:      { title: '환율 급등', body: '원달러 환율이 뛰어 수입 원료값이 올랐다.', w: 0.8, days: 8, cost: 1.08, label: '환율 급등 · 원가 +8%' },
   rawUp:     { title: '국제 원자재값 폭등', body: '국제 원자재 가격이 크게 올랐다. 장기 계약을 맺은 가게는 영향을 받지 않는다.', w: 1, days: 6, cost: 1.12, label: '원자재 폭등 · 원가 +12%' },
   rawDown:   { title: '국제 원자재값 하락', body: '국제 원자재 가격이 내렸다.', w: 1, days: 6, cost: 0.92, label: '원자재 하락 · 원가 −8%' },
-  moodDown:  { title: '소비 심리 위축', body: '경기 불안 뉴스가 이어지며 사람들이 지갑을 닫았다.', w: 1, days: 6, demand: 0.85, label: '소비 위축 · 손님 −15%' },
-  moodUp:    { title: '소비 심리 회복', body: '좋은 소식이 이어지며 거리에 사람이 늘었다.', w: 1, days: 6, demand: 1.12, label: '소비 회복 · 손님 +12%' },
+  moodDown:  { title: '소비 심리 위축', body: '경기 불안 뉴스가 이어지며 사람들이 지갑을 닫았다.', w: 1, days: 6, demand: 0.85, mix: { thrift: 0.08 }, label: '소비 위축 · 손님 −15% · 알뜰형 증가' },
+  moodUp:    { title: '소비 심리 회복', body: '좋은 소식이 이어지며 거리에 사람이 늘었다.', w: 1, days: 6, demand: 1.12, mix: { trend: 0.05 }, label: '소비 회복 · 손님 +12% · 유행형 증가' },
   stimulus:  { title: '정부 경기 부양책 발표', body: '정부가 지역 상품권과 소비 쿠폰을 풀었다. 다음 달 경기는 성장 국면이 된다.', w: 0.7, days: 5, demand: 1.08, phase: 1, label: '부양책 · 손님 +8%' },
-  austerity: { title: '긴축 정책 발표', body: '정부가 지출을 줄이겠다고 발표했다. 다음 달 경기는 위축 국면이 된다.', w: 0.7, days: 5, demand: 0.92, phase: 3, label: '긴축 · 손님 −8%' },
-  epidemic:  { title: '감염병 유행', body: '감염병이 번지며 거리에 사람이 줄고 물류도 막혔다.', w: 0.3, days: 8, demand: 0.75, cost: 1.06, label: '감염병 · 손님 −25%, 원가 +6%' },
+  austerity: { title: '긴축 정책 발표', body: '정부가 지출을 줄이겠다고 발표했다. 다음 달 경기는 위축 국면이 된다.', w: 0.7, days: 5, demand: 0.92, phase: 3, mix: { thrift: 0.05 }, label: '긴축 · 손님 −8%' },
+  epidemic:  { title: '감염병 유행', body: '감염병이 번지며 거리에 사람이 줄고 물류도 막혔다.', w: 0.3, days: 8, demand: 0.75, cost: 1.06, mix: { loyal: 0.10 }, label: '감염병 · 손님 −25%, 원가 +6% · 단골 증가' },
 };
 
 /* ---------- 상태 ---------- */
@@ -703,6 +736,31 @@ function rand2() {
   t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
+// 손님 선택 전용 난수 (시드로 정해짐, 시장 흐름과 따로 돈다)
+function rand4() {
+  let a = S.rs4 = (S.rs4 + 0x6D2B79F5) | 0;
+  let t = Math.imul(a ^ (a >>> 15), 1 | a);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+// 지금 거리 손님 구성 (경기 + 외부 충격)
+function segMix() {
+  const w = SEGS.map(sg => Math.max(0.02, SEG_MIX[sg.key][S.phase] + S.effects.reduce((a, e) => a + ((e.mix && e.mix[sg.key]) || 0), 0)));
+  const t = w.reduce((a, b) => a + b, 0); return w.map(x => x / t);
+}
+// 한 유형의 손님이 각 가게를 고를 확률
+function segProbs(sg, stores, ph) {
+  let w;
+  if (sg.loyal) {
+    // 단골: 다니던 가게(단골 비중)로 간다. 15% 넘게 비싸지거나 품질이 크게 밀리면 조금씩 떠난다
+    const minP = Math.min(...stores.map(x => x.p)), maxQ = Math.max(...stores.map(x => x.Q));
+    w = stores.map(x => x.L * (x.p > minP * 1.15 ? 0.6 : 1) * (x.Q < maxQ - 1.5 ? 0.75 : 1) * Math.pow(REF / x.p, ph.elas * 0.3) * x.mod);
+    if (!(w.reduce((a, b) => a + b, 0) > 0)) return segProbs(SEGS[4], stores, ph);
+  } else {
+    w = stores.map(x => { const a = Math.pow(x.Q, sg.qExp) * (1 + sg.bMul * x.B / 100) * Math.pow(REF / x.p, ph.elas * sg.elasMul) * x.mod * (x.style === sg.focus ? 1.1 : 1); return a * a; });
+  }
+  const t = w.reduce((a, b) => a + b, 0); return w.map(x => x / t);
+}
 // 조사: 받침이 있으면 a, 없으면 b ('으로/로'는 ㄹ 받침이면 '로')
 function josa(w, a, b, ro) {
   const c = w.charCodeAt(w.length - 1); if (c < 0xAC00 || c > 0xD7A3) return b;
@@ -725,7 +783,7 @@ const shownPrice = r => D().infoDelay ? r.shownP : priceOf(r);
 const leadRival = () => openRivals().reduce((b, r) => (!b || (r.lastShare ?? 0) > (b.lastShare ?? 0) ? r : b), null);
 function mkRival(o) {
   return { id: S.nextId++, mult: 1, attackLeft: 0, cooldown: 0, retrench: false, lastAdj: -99, label: '', state: 'open', negMonths: 0,
-    dayShare: 0, lastShare: null, lastDayShare: null, shownP: o.base, costMod: 1, tier: 0, attackBias: 0, ...o };
+    dayShare: 0, dayU: 0, lastShare: null, lastDayShare: null, shownP: o.base, costMod: 1, tier: 0, attackBias: 0, loyal: 0.04, ...o };
 }
 // 경쟁 단계가 오를수록 새 가게가 강해진다 (단계마다 품질·브랜드·자금·공세 성향)
 const ESC = { q: 0.8, b: 10, cash: 12000000, bias: 0.05 };
@@ -751,7 +809,8 @@ function addEffect(e) {
 }
 const effMul = (field, filter = () => true) => S.effects.filter(filter).reduce((m, e) => m * (e[field] ?? 1), 1);
 const effSum = field => S.effects.reduce((m, e) => m + (e[field] ?? 0), 0);
-const blankMon = () => ({ rev: 0, var: 0, fixed: 0, invest: 0, interest: 0, uM: 0, uR: 0, rvRev: 0, rvVar: 0, shareSum: 0, relSum: 0, nSum: 0, ticks: 0, priceSum: 0, rpSum: 0, emerg: false });
+const blankMon = () => ({ rev: 0, var: 0, fixed: 0, invest: 0, interest: 0, uM: 0, uR: 0, rvRev: 0, rvVar: 0, shareSum: 0, relSum: 0, nSum: 0, ticks: 0, priceSum: 0, rpSum: 0, emerg: false,
+  visitors: 0, buyers: 0, units: 0, meVisit: 0, meBuy: 0, seg: Object.fromEntries(SEGS.map(sg => [sg.key, { visit: 0, buy: 0, all: 0, me: 0 }])) });
 // 경쟁사 가격(여러 곳이면 평균)
 const rivalPrice = () => { const o = openRivals(); return o.length ? Math.round(avg(o.map(priceOf)) / 100) * 100 : 12000; };
 
@@ -764,13 +823,14 @@ function newGame(cfg) {
   const al = cfg.alloc || { q: 0, b: 0 };
   S = {
     cfg, rs: (cfg.seed >>> 0) || 1, g: 0, tick: 0, dayFrac: 0, dayShare: 0, phase: 2,
-    me: { price: 12000, Q: 5 + (cfg.qStep ?? ALLOC_Q) * al.q, B: 30 + (cfg.bStep ?? ALLOC_B) * al.b, cash: Math.round(30000000 * d.cash), debt: 0, emerg: 0, credit: 1, health: 60, streak: 0, supplier: 1, supplierUntil: -1, locked: false, everBorrowed: false, profitStreak: 0, costMod: 1, storeMod: 1, remodels: 0, memberUntil: 0, freeQ: cfg.freeQ === false ? 0 : (cfg.qStep ?? ALLOC_Q) * al.q },
+    me: { price: 12000, Q: 5 + (cfg.qStep ?? ALLOC_Q) * al.q, B: 30 + (cfg.bStep ?? ALLOC_B) * al.b, cash: Math.round(30000000 * d.cash), debt: 0, emerg: 0, credit: 1, health: 60, streak: 0, supplier: 1, supplierUntil: -1, locked: false, everBorrowed: false, profitStreak: 0, costMod: 1, storeMod: 1, remodels: 0, memberUntil: 0, loyal: 0.5, freeQ: cfg.freeQ === false ? 0 : (cfg.qStep ?? ALLOC_Q) * al.q },
     rivals: [], gone: [], nextId: 1, tier: 1, entries: [],
     pending: [], mon: blankMon(), months: [], days: [], log: [], decisions: [], attacks: [], event: null,
     shownRp: 12000, lastLoggedPrice: 12000, ended: null, forced: {}, sched: [], startCash: Math.round(30000000 * d.cash),
-    rs2: (((cfg.seed >>> 0) || 1) ^ 0x9E3779B9) | 0, rs3: (((cfg.seed >>> 0) || 1) ^ 0x51ED270B) | 0, effects: [], say: null,
+    rs2: (((cfg.seed >>> 0) || 1) ^ 0x9E3779B9) | 0, rs3: (((cfg.seed >>> 0) || 1) ^ 0x51ED270B) | 0, rs4: (((cfg.seed >>> 0) || 1) ^ 0x2545F491) | 0, effects: [], say: null,
+    carry: {}, buyCarry: {}, dayU: { me: 0, all: 0 },
   };
-  S.main = mkRival({ name: '뉴웨이브', key: 'newwave', style: 'main', colors: MAIN_COLORS, ceo: CEO(), base: 12000, floor: 10500, cap: 14500, Q: 5, B: 30, cash: 45000000, openedAt: 0 });
+  S.main = mkRival({ name: '뉴웨이브', key: 'newwave', style: 'main', colors: MAIN_COLORS, ceo: CEO(), base: 12000, floor: 10500, cap: 14500, Q: 5, B: 30, cash: 45000000, openedAt: 0, loyal: 0.5 });
   S.rivals.push(S.main);
   // 새 경쟁사가 들어오는 차례와 시기: 4월 초, 7~8월 초 (시드로 정해짐)
   S.entrantPool = [...ENTRANTS];
@@ -818,27 +878,58 @@ function scheduleExtraEvents() {
 function engineTick() {
   const ph = PHASES[S.phase], me = S.me, m = S.mon;
   const open = openRivals(), n = 1 + open.length;
-  const aM = attract(me.price, me.Q, me.B, ph.elas) * effMul('meAttract') * me.storeMod;
-  const ps = open.map(priceOf), as = open.map((r, i) => attract(ps[i], r.Q, r.B, ph.elas));
-  const sumSq = aM * aM + as.reduce((s, a) => s + a * a, 0);
-  const sM = (aM * aM) / sumSq;
-  const tf = clamp(Math.pow(REF / ((me.price + ps.reduce((s, p) => s + p, 0)) / n), 0.6), 0.5, 1.5);
-  const potential = BASE * ph.demand * (0.94 + rand() * 0.12) / TICKS * effMul('demand') * marketSize(n);
-  const units = potential * tf, uM = units * sM;
+  // 이 거리의 가게들 (0번 = 내 가게)
+  const stores = [{ r: null, p: me.price, Q: me.Q, B: me.B, mod: effMul('meAttract') * me.storeMod, style: 'me', L: me.loyal * (me.memberUntil > S.g ? 1.5 : 1) }]
+    .concat(open.map(r => ({ r, p: priceOf(r), Q: r.Q, B: r.B, mod: 1, style: r.style, L: r.loyal })));
+  const avgP = stores.reduce((s, x) => s + x.p, 0) / n;
+  const tf = clamp(Math.pow(REF / avgP, 0.6), 0.5, 1.5);
+  // ① 거리 방문자 → ② 구매율 → ③ 1인당 구매량 (세 배율을 곱하면 기존 경기 배율과 같다)
+  const visitUnits = BASE * TRAFFIC[S.phase] * (0.94 + rand() * 0.12) / TICKS * effMul('demand') * marketSize(n) / CONV_BASE;
+  const conv = clamp(CONV_BASE * CONV[S.phase] * tf, 0.05, 1), basket = BASKET[S.phase];
+  const mix = segMix();
+  const G = UPC * marketSize(n);   // 화면 속 1명이 나타내는 손님 수 (거리가 커지면 1명이 더 많은 손님을 뜻한다)
+  S.groupSize = G;
+  const probs = SEGS.map(sg => segProbs(sg, stores, ph));
+  const units = stores.map(() => 0), visit = stores.map(() => 0);
+  const spawn = [];
+  // 유형별 손님 무리를 가게마다 나눠 보낸다: 기대 인원에 약간의 운(±15%)을 섞고, 소수점은 다음 틱으로 넘긴다
+  SEGS.forEach((sg, k) => {
+    const exp = visitUnits * mix[k] / G, seg = m.seg[sg.key], pr = probs[k];
+    stores.forEach((st, i) => {
+      const key = (st.r ? st.r.id : 0) + ':' + k;
+      S.carry[key] = (S.carry[key] ?? rand4()) + exp * pr[i] * (0.85 + 0.3 * rand4());
+      while (S.carry[key] >= 1) {
+        S.carry[key] -= 1;
+        S.buyCarry[key] = (S.buyCarry[key] ?? rand4()) + conv;
+        const buy = S.buyCarry[key] >= 1; if (buy) S.buyCarry[key] -= 1;
+        const u = buy ? G * basket : 0;
+        visit[i] += G; units[i] += u;
+        seg.visit += G; if (buy) { seg.buy += G; seg.all += u; if (i === 0) seg.me += u; }
+        spawn.push({ t: i === 0 ? 'me' : S.rivals.indexOf(st.r), buy, seg: k });
+      }
+    });
+  });
+  const total = units.reduce((s, u) => s + u, 0);
+  const shareOf = i => total > 0 ? units[i] / total : 1 / n;
+  const sM = shareOf(0), uM = units[0];
   const shockCost = effMul('cost'), shockCostMe = me.locked ? effMul('cost', e => e.key !== 'rawUp' && e.key !== 'fxUp') : shockCost;
   const cM = unitCost(me.Q - me.freeQ) * me.supplier * me.costMod * shockCostMe;
   me.cash += uM * (me.price - cM);
-  const uRs = S.rivals.map(() => 0);
   let uR = 0, rRev = 0, rVar = 0;
-  open.forEach((r, i) => {
-    const s = (as[i] * as[i]) / sumSq, u = units * s, c = unitCost(r.Q) * r.costMod * shockCost;
-    r.cash += u * (ps[i] - c); r.dayShare += s; r.lastShare = s;
-    uRs[S.rivals.indexOf(r)] = u; uR += u; rRev += u * ps[i]; rVar += u * c;
+  S.dayU.all += total; S.dayU.me += uM;
+  stores.forEach((st, i) => {
+    if (!st.r) return;
+    const r = st.r, u = units[i], c = unitCost(r.Q) * r.costMod * shockCost;
+    r.cash += u * (st.p - c); r.dayShare += shareOf(i); r.dayU += u;
+    r.lastShare = S.dayU.all > 0 ? r.dayU / S.dayU.all : 1 / n;
+    uR += u; rRev += u * st.p; rVar += u * c;
   });
   m.rev += uM * me.price; m.var += uM * cM; m.uM += uM; m.uR += uR; m.rvRev += rRev; m.rvVar += rVar;
-  m.shareSum += sM; m.relSum += relShare(sM, n); m.nSum += n; m.ticks++; m.priceSum += me.price; m.rpSum += uR > 0 ? rRev / uR : (ps.length ? avg(ps) : me.price);
-  S.dayShare += sM; S.lastShare = sM; S.dayN = (S.dayN || 0) + n;
-  hooks.spawn(uM, uRs, potential);
+  m.visitors += visit.reduce((s, v) => s + v, 0); m.buyers += spawn.filter(x => x.buy).length * G; m.units += total; m.meVisit += visit[0];
+  m.meBuy += spawn.filter(x => x.buy && x.t === 'me').length * G;
+  m.shareSum += sM; m.relSum += relShare(sM, n); m.nSum += n; m.ticks++; m.priceSum += me.price; m.rpSum += uR > 0 ? rRev / uR : (n > 1 ? (avgP * n - me.price) / (n - 1) : me.price);
+  S.dayShare += sM; S.lastShare = S.dayU.all > 0 ? S.dayU.me / S.dayU.all : sM; S.dayN = (S.dayN || 0) + n;
+  hooks.spawn(spawn);
   if (S.event && S.event.ticksLeft != null) {
     S.event.ticksLeft--;
     if (S.event.ticksLeft <= 0) resolveEvent(PEVENTS[S.event.key].def, true);
@@ -852,9 +943,18 @@ function endDay() {
   const n = (S.dayN || TICKS * openCount()) / TICKS, share = S.dayShare / TICKS;
   S.days.push({ g: S.g, share, rel: relShare(share, n), n, cash: me.cash, price: me.price, rp: rivalPrice(), phase: S.phase, att: S.rivals.some(r => r.attackLeft > 0) });
   S.dayShare = 0; S.dayN = 0;
+  // 단골 비중: 그날 많이 판 가게일수록 단골이 쌓인다 (멤버십 중이면 내 단골이 덜 빠진다)
+  const dayAll = S.dayU.all, opn = openRivals();
+  if (dayAll > 0) {
+    me.loyal = me.loyal * (me.memberUntil > S.g ? 0.96 : 0.9) + 0.1 * S.dayU.me / dayAll;
+    for (const r of opn) r.loyal = r.loyal * 0.9 + 0.1 * r.dayU / dayAll;
+    const t = me.loyal + opn.reduce((a, r) => a + r.loyal, 0); me.loyal /= t; for (const r of opn) r.loyal /= t;
+  }
+  S.dayU = { me: 0, all: 0 };
   for (const rv of S.rivals) {
     if (rv.state !== 'open') continue;
-    rv.lastDayShare = rv.dayShare / TICKS; rv.dayShare = 0;
+    rv.lastDayShare = rv.dayShare / TICKS; rv.dayShare = 0; rv.dayU = 0;
+    rv.hist = (rv.hist || []).concat(rv.lastDayShare).slice(-3);
     rv.shownP = priceOf(rv);
     if (rv.attackLeft > 0) { rv.attackLeft--; if (rv.attackLeft === 0) { rv.mult = 1; news(`${rv.name}의 할인 공세가 끝났다.`, 'rival'); } }
     if (rv.cooldown > 0) rv.cooldown--;
@@ -890,8 +990,9 @@ function rivalDecide() {
 }
 function decideOne(rv, last) {
   const me = S.me, d = D(), n = openCount();
-  const meRel = last ? last.rel : 0.5;
-  const rvRel = rv.lastDayShare != null ? relShare(rv.lastDayShare, n) : 0.5;
+  // 손님 선택에 운이 섞이므로, 경쟁사는 최근 3일 평균 판매를 보고 판단한다
+  const recent = S.days.slice(-3), meRel = recent.length ? avg(recent.map(x => x.rel)) : 0.5;
+  const rvRel = rv.hist && rv.hist.length ? relShare(avg(rv.hist), n) : 0.5;
   const pend = kind => S.pending.some(p => p.who === rv.id && (!kind || p.kind === kind));
   const say = key => rivalSay(key, rv);
   if (rv.cash < 0) {
@@ -975,7 +1076,7 @@ function runScheduled(it) {
     hooks.event();
   } else if (it.kind === 'shock') {
     const sh = SHOCKS[it.key];
-    addEffect({ key: it.key, label: sh.label, demand: sh.demand, cost: sh.cost, rate: sh.rate, days: sh.days });
+    addEffect({ key: it.key, label: sh.label, demand: sh.demand, cost: sh.cost, rate: sh.rate, mix: sh.mix, days: sh.days });
     if (sh.phase != null) { const next = S.months.length + 1; if (S.forced[next] == null) S.forced[next] = sh.phase; }
     news(`[경제 뉴스] ${sh.title}. ${sh.body}`, 'phase');
     hooks.toast?.(`📰 ${sh.title} — ${sh.label.split(' · ')[1] || ''}`);
@@ -1048,7 +1149,10 @@ function endMonth() {
   }
   const lead = leadRival() || S.main;
   const row = { m: mNo, rev: m.rev, var: m.var, fixed: m.fixed, invest: m.invest, interest: m.interest, op, cash: me.cash, capital, debt: me.debt + me.emerg,
-    share, rel, n: nAvg, rivals: snap, tier: S.tier, price: m.priceSum / m.ticks, rp: m.rpSum / m.ticks, phase: prev, next: S.phase, health: me.health, dh, Q: me.Q, B: me.B, rvQ: lead.Q, rvB: lead.B, emerg: m.emerg, streak: me.streak };
+    share, rel, n: nAvg, rivals: snap, tier: S.tier,
+    visitors: m.visitors, buyers: m.buyers, units: m.units, meVisit: m.meVisit, meBuy: m.meBuy,
+    segShare: Object.fromEntries(SEGS.map(sg => [sg.key, m.seg[sg.key].all > 0 ? m.seg[sg.key].me / m.seg[sg.key].all : 0])),
+    segMix: Object.fromEntries(SEGS.map(sg => [sg.key, m.visitors > 0 ? m.seg[sg.key].visit / m.visitors : 0])), price: m.priceSum / m.ticks, rp: m.rpSum / m.ticks, phase: prev, next: S.phase, health: me.health, dh, Q: me.Q, B: me.B, rvQ: lead.Q, rvB: lead.B, emerg: m.emerg, streak: me.streak };
   S.months.push(row);
   S.mon = blankMon();
   if (prev !== S.phase) { news(`경기가 '${PHASES[prev].name}'에서 '${PHASES[S.phase].name}'(으)로 바뀌었다.`, 'phase'); hooks.tip('phase'); }
@@ -1185,40 +1289,43 @@ function streetLayout() {
 const SKY = [['#2d6aa0', '#b4dcec'], ['#3a6890', '#b3cddc'], ['#46617e', '#a3b4c2'], ['#4b5565', '#8b95a2'], ['#363b46', '#666d79']];
 const skyline = [];
 (() => { let x = -4; while (x < W) { const w = 16 + (Math.random() * 30 | 0), h = 34 + (Math.random() * 54 | 0); skyline.push({ x, w, h, lit: Math.random() }); x += w + 1; } })();
-const VIS = { cust: [], queue: [], pops: [], rain: [], carry: { m: 0, r: [], p: 0 }, t: 0 };
-const SHIRTS = ['#d9644a', '#4a8ad9', '#58b07a', '#c9a64a', '#9b6fd0', '#e0e0e0', '#d07aa0', '#5bb8c4'];
+const VIS = { cust: [], queue: [], pops: [], rain: [], t: 0 };
 
-hooks.spawn = (uM, uRs, pot) => {
-  const c = VIS.carry, tickSec = SEC_DAY / TICKS;
-  c.m += uM / UPC; c.p += pot * 0.22 / UPC;
-  uRs.forEach((u, i) => { c.r[i] = (c.r[i] || 0) + u / UPC; });
-  const push = (target) => VIS.queue.push({ delay: Math.random() * tickSec, target });
-  while (c.m >= 1) { c.m--; push('me'); }
-  c.r.forEach((_, i) => { while (c.r[i] >= 1) { c.r[i]--; push(i); } });
-  while (c.p >= 1) { c.p--; push('pass'); }
-  if (VIS.queue.length > 160) VIS.queue.splice(0, VIS.queue.length - 160);
+// 엔진이 고른 손님 무리가 그대로 거리에 나온다 (1명 = 손님 S.groupSize명). 옷 색 = 손님 유형
+hooks.spawn = (list) => {
+  const tickSec = SEC_DAY / TICKS;
+  for (const g of list) VIS.queue.push({ delay: Math.random() * tickSec, target: g.t, buy: g.buy, seg: g.seg });
 };
 
+const storeColor = t => t === 'me' ? '#f0b44c' : (S && S.rivals[t] && S.rivals[t].colors ? S.rivals[t].colors.sign : '#a495ff');
 function updateVisual(gdt) {
   VIS.t += gdt;
   for (const q of VIS.queue) q.delay -= gdt;
   const ready = VIS.queue.filter(q => q.delay <= 0);
   VIS.queue = VIS.queue.filter(q => q.delay > 0);
   for (const q of ready) {
-    if (VIS.cust.length > 110) break;
-    const fromLeft = Math.random() < 0.5;
-    VIS.cust.push({ x: fromLeft ? -6 : W + 6, y: 137 + (Math.random() * 9 | 0), dir: fromLeft ? 1 : -1, target: q.target, state: 'walk', shirt: SHIRTS[Math.random() * SHIRTS.length | 0], sp: 42 + Math.random() * 18, ph: Math.random() * 6 });
+    if (VIS.cust.length > 700) break;   // 안전장치 (보통은 닿지 않는다)
+    const fromLeft = Math.random() < 0.5, y0 = 137 + (Math.random() * 9 | 0);
+    VIS.cust.push({ x: fromLeft ? -6 : W + 6, y: y0, y0, dir: fromLeft ? 1 : -1, target: q.target, buy: q.buy, seg: q.seg, state: 'walk', shirt: SEGS[q.seg].color, sp: 42 + Math.random() * 18, ph: Math.random() * 6 });
   }
   const L = streetLayout();
   for (const c of VIS.cust) {
-    if (c.state === 'walk') {
+    if (c.state === 'walk' || c.state === 'leave') {
       c.x += c.dir * c.sp * gdt; c.ph += gdt * 10;
-      const door = c.target === 'me' ? L.me.door : typeof c.target === 'number' && S && S.rivals[c.target] && S.rivals[c.target].state === 'open' && L.rv[c.target] ? L.rv[c.target].door : null;
-      if (door != null && Math.abs(c.x - door) < 3) { c.state = 'enter'; c.x = door + (Math.random() * 8 - 4); }
+      if (c.state === 'walk') {
+        const door = c.target === 'me' ? L.me.door : typeof c.target === 'number' && S && S.rivals[c.target] && S.rivals[c.target].state === 'open' && L.rv[c.target] ? L.rv[c.target].door : null;
+        if (door != null && Math.abs(c.x - door) < 3) { c.state = 'enter'; c.x = door + (Math.random() * 8 - 4); }
+      }
       if (c.x < -10 || c.x > W + 10) c.dead = true;
-    } else {
+    } else if (c.state === 'enter') {
       c.y -= 22 * gdt; c.ph += gdt * 10;
-      if (c.y < 126) { c.dead = true; VIS.pops.push({ x: c.x, y: 112, life: 0.7, me: c.target === 'me', color: c.target === 'me' ? '#f0b44c' : (S && S.rivals[c.target] && S.rivals[c.target].colors ? S.rivals[c.target].colors.sign : '#a495ff') }); }
+      if (c.y < 126) { c.state = 'inside'; c.wait = 0.35 + Math.random() * 0.5; if (c.buy) VIS.pops.push({ x: c.x, y: 112, life: 0.7, me: c.target === 'me', color: storeColor(c.target) }); }
+    } else if (c.state === 'inside') {
+      c.wait -= gdt;
+      if (c.wait <= 0) { c.state = 'exit'; if (!c.buy) VIS.pops.push({ x: c.x, y: 114, life: 0.6, text: '…', color: '#b8bfcc' }); }
+    } else if (c.state === 'exit') {
+      c.y += 22 * gdt; c.ph += gdt * 10;
+      if (c.y >= c.y0) { c.y = c.y0; c.state = 'leave'; }
     }
   }
   VIS.cust = VIS.cust.filter(c => !c.dead);
@@ -1331,13 +1438,14 @@ function drawBubble(say) {
   lines.forEach((ln, i) => text(ln, bx + av + pad * 2, by + pad + 5 + i * 9 + (lines.length === 1 ? (av - 9) / 2 : 0), "600 7.5px 'IBM Plex Sans KR', sans-serif", '#17123a', 'left'));
 }
 function drawPerson(c) {
+  if (c.state === 'inside') return;
   const x = Math.round(c.x), y = Math.round(c.y), step = Math.floor(c.ph) % 2;
-  ctx.globalAlpha = c.target === 'pass' ? 0.55 : 1;
   px(x - 1, y - 11, 3, 3, '#f0c9a0');
   px(x - 2, y - 8, 5, 5, c.shirt);
   px(x - 1 + (step ? -1 : 0), y - 3, 1, 3, '#2b2f3a');
   px(x + 1 + (step ? 1 : 0), y - 3, 1, 3, '#2b2f3a');
-  ctx.globalAlpha = 1;
+  // 산 손님은 그 가게 색 봉투를 들고 나온다
+  if (c.buy && (c.state === 'exit' || c.state === 'leave')) { const bx = c.dir > 0 ? x + 3 : x - 5; px(bx, y - 6, 3, 4, storeColor(c.target)); px(bx + 1, y - 7, 1, 1, '#2b2f3a'); }
 }
 
 /* 하루 = 낮(앞 절반) + 밤(뒤 절반). 밝기는 사인 곡선으로 새벽·노을을 지나간다. */
@@ -1384,8 +1492,8 @@ function draw() {
   px(0, 132, W, 18, '#3c414e'); for (let x = 0; x < W; x += 16) px(x, 132, 1, 18, 'rgba(0,0,0,.18)');
   px(0, 150, W, 2, '#8a8f9c'); px(0, 152, W, 24, '#252932');
   for (let x = 8; x < W; x += 32) px(x, 163, 14, 2, '#c8b878');
-  for (const c of VIS.cust) if (c.state === 'enter') drawPerson(c);
-  for (const c of VIS.cust) if (c.state === 'walk') drawPerson(c);
+  for (const c of VIS.cust) if (c.state === 'enter' || c.state === 'exit') drawPerson(c);
+  for (const c of VIS.cust) if (c.state === 'walk' || c.state === 'leave') drawPerson(c);
   ctx.strokeStyle = 'rgba(190,205,225,.55)'; ctx.lineWidth = 1;
   for (const r of VIS.rain) { ctx.beginPath(); ctx.moveTo(r.x, r.y); ctx.lineTo(r.x - 1.5, r.y + 5); ctx.stroke(); }
   if (S && S.phase >= 3) { ctx.fillStyle = S.phase === 4 ? 'rgba(20,24,34,.22)' : 'rgba(20,24,34,.1)'; ctx.fillRect(0, 0, W, H); }
@@ -1404,7 +1512,7 @@ function draw() {
   }
   glowStore(L.me, oMe, dark); oRvs.forEach((o, i) => { if (L.rv[i]) glowStore(L.rv[i], o, dark); });
   if (S && S.say && Date.now() - S.say.t < 4500) drawBubble(S.say);
-  for (const p of VIS.pops) { ctx.globalAlpha = clamp(p.life / 0.7, 0, 1); text(p.me ? '+₩' : '•', p.x, p.y, "600 8px 'IBM Plex Sans KR', sans-serif", p.color || (p.me ? '#f0b44c' : '#a495ff')); ctx.globalAlpha = 1; }
+  for (const p of VIS.pops) { ctx.globalAlpha = clamp(p.life / 0.7, 0, 1); text(p.text || (p.me ? '+₩' : '•'), p.x, p.y, "600 8px 'IBM Plex Sans KR', sans-serif", p.color || (p.me ? '#f0b44c' : '#a495ff')); ctx.globalAlpha = 1; }
 }
 
 /* ---------- 화면 갱신 ---------- */
@@ -1455,6 +1563,13 @@ hooks.banner = row => {
     ['건강도', `${Math.round(row.health)} (${row.dh >= 0 ? '+' : ''}${row.dh})`, row.dh >= 0 ? 'pos' : 'neg'],
     ['자본 잠식', `${row.streak}/4`, row.streak ? 'neg' : ''], ['신용등급', CREDIT[S.me.credit].g],
   ]);
+  kv(el('stCust'), [
+    ['거리 방문자', `${Math.round(row.visitors).toLocaleString('ko-KR')}명` + (prev ? ` (지난달 ${Math.round(prev.visitors).toLocaleString('ko-KR')})` : '')],
+    ['구매율', row.visitors ? pct(row.buyers / row.visitors) + (prev && prev.visitors ? ` (지난달 ${pct(prev.buyers / prev.visitors)})` : '') : '-'],
+    ['1인당 구매량', row.buyers ? `${(row.units / row.buyers).toFixed(2)}개` : '-'],
+    ['내 가게 방문 → 구매', `${Math.round(row.meVisit).toLocaleString('ko-KR')}명 → ${Math.round(row.meBuy).toLocaleString('ko-KR')}명`],
+  ]);
+  renderSegs(el('stSeg'), row.segMix, row.segShare, prev && prev.segShare);
   renderContract(el('stContract'), false);
   el('stContract').hidden = S.cfg.contract === 'none';
   const log = el('stLog'); log.innerHTML = '';
@@ -1466,6 +1581,15 @@ hooks.banner = row => {
   el('settleModal').hidden = false;
   el('stOk').focus({ preventScroll: true });
 };
+// 손님 유형표: 유형 · 거리 비중 · 내 점유율(막대) · 숫자
+function renderSegs(box, mix, share, prevShare) {
+  let h = '<span class="h">유형</span><span class="h"></span><span class="h">거리 비중</span><span class="h">내 점유율</span>';
+  for (const sg of SEGS) {
+    const v = share[sg.key] || 0, d = prevShare ? Math.round((v - (prevShare[sg.key] || 0)) * 100) : null;
+    h += `<span title="${sg.desc}"><i style="background:${sg.color}"></i>${sg.name}</span><span class="seg-bar"><b style="width:${Math.round(v * 100)}%"></b></span><span class="num">${pct(mix[sg.key] || 0)}</span><span class="num">${pct(v)}${d ? `<small style="color:${d > 0 ? 'var(--good)' : 'var(--bad)'}"> ${d > 0 ? '+' : ''}${d}</small>` : ''}</span>`;
+  }
+  if (box.dataset.h !== h) { box.innerHTML = h; box.dataset.h = h; }
+}
 function closeSettle() { el('settleModal').hidden = true; pauses.delete('settle'); }
 hooks.event = () => {
   const modal = $('#eventModal');
@@ -1517,6 +1641,11 @@ function updateHUD() {
   const emergNow = S.mon.emerg || (me.cash + (pm.opEst - pm.gross) < 0);
   const dh = healthDelta(pm.opEst, emergNow, curShare);
   el('healthNote').textContent = `월말 예상 변화 ${dh >= 0 ? '+' : ''}${dh}` + (emergNow ? ' · 긴급 차입 예상' : '');
+  // 이번 달 손님 흐름
+  const mm = S.mon;
+  el('custFlow').textContent = mm.visitors ? `화면 1명 = 손님 ${Math.round(S.groupSize || UPC)}명 · 거리 방문 ${Math.round(mm.visitors).toLocaleString('ko-KR')}명 · 구매율 ${pct(mm.buyers / mm.visitors)} · 1인당 ${(mm.units / Math.max(1, mm.buyers)).toFixed(2)}개 · 내 가게 ${Math.round(mm.meVisit).toLocaleString('ko-KR')}명 방문 → ${Math.round(mm.meBuy).toLocaleString('ko-KR')}명 구매` : '아직 손님이 없다.';
+  const mixNow = segMix();
+  renderSegs(el('segTable'), Object.fromEntries(SEGS.map((sg, k) => [sg.key, mixNow[k]])), Object.fromEntries(SEGS.map(sg => [sg.key, mm.seg[sg.key].all > 0 ? mm.seg[sg.key].me / mm.seg[sg.key].all : 0])));
   // 경쟁사 비교표: 내 가게 + 거리의 경쟁사들
   const n = openCount(), vs = el('vsTable');
   const cols = [{ name: '내 가게', color: 'var(--me)', p: me.price.toLocaleString('ko-KR'), q: me.Q.toFixed(1), b: Math.round(me.B), sh: pct(S.lastShare ?? 0.5) }]
@@ -1757,6 +1886,9 @@ function monthPayload(row) {
   return {
     difficulty: DIFF[S.cfg.diff].name, contract: CONTRACTS[S.cfg.contract].name, rival: `뉴웨이브 상사(대표 ${CEO().name})`,
     storesOnStreet: Math.round(row.n), competitionStage: row.tier, fairShare: Math.round(100 / row.n),
+    customers: { streetVisitors: Math.round(row.visitors), purchaseRate: row.visitors ? Math.round(row.buyers / row.visitors * 100) : 0, unitsPerBuyer: row.buyers ? +(row.units / row.buyers).toFixed(2) : 0,
+      myVisitors: Math.round(row.meVisit), myBuyers: Math.round(row.meBuy),
+      bySegment: SEGS.map(sg => ({ type: sg.name, streetMix: Math.round(row.segMix[sg.key] * 100), myShare: Math.round(row.segShare[sg.key] * 100) })) },
     rivals: (row.rivals || []).map(r => ({ name: r.name, ceo: r.ceo, price: r.price, quality: +r.Q.toFixed(1), brand: Math.round(r.B), share: Math.round(r.share * 100) })),
     month: row.m, phase: PHASES[row.phase].name, nextPhase: PHASES[row.next].name,
     revenue_man: man(row.rev), variableCost_man: man(row.var), fixedCost_man: man(row.fixed), interest_man: man(row.interest), invest_man: man(row.invest),
@@ -1817,6 +1949,12 @@ function showReport() {
   if (attD.length) facts.push(`경쟁사 공세 ${S.attacks.length}회, 공세 기간 평균 점유율 ${pct(avg(attD.map(x => x.share)))} · 그 외 기간 ${pct(avg(calm.map(x => x.share)))}.`);
   const em = months.filter(x => x.emerg).map(x => x.m + '월');
   if (em.length) facts.push(`긴급 운전자금이 생긴 달: ${em.join(', ')}.`);
+  if (months.length && months[0].segShare) {
+    const ys = SEGS.map(sg => ({ sg, v: avg(months.map(r => r.segShare[sg.key])) })).sort((x, y) => y.v - x.v);
+    facts.push(`손님 유형별 평균 점유율: ${ys.map(x => `${x.sg.name} ${pct(x.v)}`).join(' · ')} — 가장 강했던 층은 ${ys[0].sg.name}, 가장 약했던 층은 ${ys[ys.length - 1].sg.name}.`);
+    const conv = months.filter(r => r.visitors).map(r => ({ m: r.m, c: r.buyers / r.visitors }));
+    if (conv.length > 1) { const lo = conv.reduce((a, b) => b.c < a.c ? b : a), hi = conv.reduce((a, b) => b.c > a.c ? b : a); facts.push(`거리 구매율이 가장 낮았던 달: ${lo.m}월 ${pct(lo.c)} · 가장 높았던 달: ${hi.m}월 ${pct(hi.c)}.`); }
+  }
   if (S.entries.length) facts.push(`새로 들어온 경쟁사: ${S.entries.map(e => `${e.name}(${dateOf(e.g).m}월)`).join(', ')} · 최종 경쟁 ${S.tier}단계.`);
   const closedR = S.gone.concat(S.rivals).filter(r => r.closedAt != null);
   if (closedR.length) facts.push(`문을 닫은 경쟁사: ${closedR.map(r => `${r.name}(${dateOf(r.closedAt).m}월)`).join(', ')}.`);
@@ -1945,7 +2083,7 @@ el('seedRnd').addEventListener('click', () => { el('seedIn').value = 1000 + Math
 
 function begin(cfg) {
   newGame(cfg);
-  VIS.cust = []; VIS.queue = []; VIS.pops = []; VIS.carry = { m: 0, r: [], p: 0 }; acc = 0;
+  VIS.cust = []; VIS.queue = []; VIS.pops = []; acc = 0;
   pauses.clear(); speed = 1; syncSpeed();
   ['startScreen', 'report', 'ledger', 'eventModal', 'settleModal'].forEach(id => el(id).hidden = true);
   hooks.news(); updateHUD();
