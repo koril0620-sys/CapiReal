@@ -1,0 +1,42 @@
+.cr2-gameover-screen {
+  width: 100%;
+  height: 100%;
+  background: var(--cr2-bg);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.cr2-gameover-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  text-align: center;
+}
+
+.cr2-gameover-title { font-size: 22px; }
+.cr2-gameover-rival-img { width: 80px; height: 80px; object-fit: contain; filter: grayscale(50%); }
+.cr2-gameover-rival-dialogue { font-size: 11px; margin-top: 4px; }
+.cr2-gameover-floor { font-size: 16px; color: var(--cr2-white); }
+.cr2-gameover-reason { font-size: 12px; color: var(--cr2-gray); }
+.cr2-gameover-stats { font-size: 11px; display: flex; flex-direction: column; gap: 4px; }
+
+.cr2-gameover-page-title { font-size: 14px; color: var(--cr2-lime); }
+.cr2-gameover-review { width: 100%; }
+.cr2-review-title { font-size: 11px; color: var(--cr2-green); margin-bottom: 8px; }
+.cr2-review-row { display: flex; justify-content: space-between; font-size: 10px; padding: 4px 0; border-bottom: 1px solid rgb(0 170 0 / 20%); }
+.cr2-gameover-advice { font-size: 10px; text-align: left; width: 100%; }
+
+.cr2-gameover-full-stats { width: 100%; }
+.cr2-stat-row { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 0; border-bottom: 1px solid rgb(0 170 0 / 20%); }
+
+.cr2-gameover-btns { display: flex; gap: 8px; margin-top: 16px; }
+
+.cr2-page-indicator { display: flex; justify-content: center; gap: 8px; padding: 8px; }
+.cr2-dot-active { color: var(--cr2-lime); }
+.cr2-dot { color: var(--cr2-gray); }
+
+.cr2-page-nav { display: flex; justify-content: space-between; padding: 8px; }

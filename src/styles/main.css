@@ -1,0 +1,630 @@
+/* 기본 레이아웃 */
+.cr2-main-screen {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+}
+
+.cr2-main-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.35);
+  z-index: 0;
+}
+
+.cr2-main-left {
+  position: relative;
+  z-index: 1;
+  width: 720px;
+  height: calc(100% - 48px);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(0, 170, 0, 0.5);
+  box-shadow: 0 0 15px var(--cr2-green-glow);
+}
+
+.cr2-pause-trigger-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 20;
+  width: 36px;
+  height: 36px;
+  background: #0a0a1f;
+  border: 2px solid var(--cr2-red);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.cr2-pause-trigger-btn:hover {
+  background: rgba(220, 20, 60, 0.15);
+  box-shadow: 0 0 8px rgba(220, 20, 60, 0.4);
+}
+
+/* 상단 오버레이 */
+.cr2-main-overlay-top {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(4, 4, 6, 0.9);
+  border: 1px solid var(--cr2-green);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 5;
+  backdrop-filter: blur(4px);
+  min-width: 200px;
+  box-shadow: 0 0 8px var(--cr2-green-glow);
+}
+
+.cr2-overlay-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cr2-overlay-floor {
+  font-size: 11px;
+  color: var(--cr2-lime);
+}
+
+.cr2-overlay-reward {
+  font-size: 8px;
+}
+
+.cr2-overlay-phase-label {
+  font-size: 8px;
+}
+
+.cr2-overlay-phase-value {
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: none;
+}
+
+.cr2-overlay-phase-multiplier {
+  font-size: 8px;
+}
+
+.cr2-overlay-phase-desc {
+  font-size: 8px;
+  color: var(--cr2-gray);
+  font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+}
+
+/* 게임 중앙 영역 */
+.cr2-game-area {
+  flex: 1;
+  position: relative;
+}
+
+/* 라이벌 카드 */
+.cr2-rival-card {
+  position: absolute;
+  top: 40px;
+  right: 12px;
+  background: rgba(8, 4, 4, 0.92);
+  border: 1px solid var(--cr2-red);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 110px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 0 12px var(--cr2-red-glow);
+}
+
+.cr2-rival-card-img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(220, 20, 60, 0.5));
+}
+
+.cr2-rival-card-name {
+  font-size: 11px;
+  color: var(--cr2-red);
+  text-align: center;
+}
+
+.cr2-rival-card-company {
+  font-size: 8px;
+  color: var(--cr2-gray);
+  text-align: center;
+}
+
+.cr2-rival-card-tier {
+  font-size: 8px;
+  color: var(--cr2-gold);
+}
+
+.cr2-rival-card-status {
+  font-size: 8px;
+}
+
+.cr2-rival-card-empty {
+  font-size: 9px;
+  padding: 16px 8px;
+}
+
+/* 수요 버블 */
+@keyframes cr2-pulse-transform {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+.cr2-demand-bubble {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: radial-gradient(circle at 30% 30%, rgba(8, 12, 8, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%);
+  border: 1px solid var(--cr2-lime);
+  border-radius: 50%;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 0 14px var(--cr2-lime-glow);
+  will-change: transform;
+  animation: cr2-pulse-transform 3s ease-in-out infinite;
+}
+
+.cr2-demand-label {
+  font-size: 9px;
+  color: var(--cr2-green);
+}
+
+.cr2-demand-value {
+  font-size: 15px;
+  color: var(--cr2-lime);
+  text-shadow: none;
+}
+
+.cr2-tooltip-btn {
+  font-size: 8px;
+  background: transparent;
+  border: 1px solid var(--cr2-gray);
+  color: var(--cr2-gray);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* 플레이어 카드 */
+.cr2-player-card {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(4, 8, 4, 0.92);
+  border: 1px solid var(--cr2-lime);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 110px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 0 12px var(--cr2-lime-glow);
+}
+
+.cr2-player-card-img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.cr2-player-card-company {
+  font-size: 10px;
+  text-align: center;
+}
+
+.cr2-player-card-ceo {
+  font-size: 8px;
+  text-align: center;
+}
+
+.cr2-health-bar {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 88px;
+}
+
+.cr2-health-cell {
+  width: 7px;
+  height: 7px;
+  transition: background 0.2s;
+}
+
+.cr2-momentum-label {
+  font-size: 8px;
+}
+
+.cr2-advisor-mini {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.cr2-advisor-mini-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  border: 1px solid var(--cr2-green);
+  border-radius: 2px;
+}
+
+.cr2-advisor-mini-name {
+  font-size: 7px;
+}
+
+/* 하단 정보 바 */
+.cr2-main-bottom {
+  display: flex;
+  gap: 6px;
+  padding: 6px 8px;
+  background: rgba(4, 6, 4, 0.9);
+  border-top: 1px solid rgba(0, 170, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.cr2-strategy-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cr2-strategy-title {
+  font-size: 9px;
+  color: var(--cr2-green);
+}
+
+.cr2-strategy-content {
+  font-size: 10px;
+  color: var(--cr2-white);
+}
+
+.cr2-learning-hint {
+  font-size: 8px;
+  color: var(--cr2-gold);
+}
+
+.cr2-finance-panel {
+  flex: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cr2-finance-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cr2-finance-capital {
+  gap: 6px;
+}
+
+.cr2-finance-big {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.cr2-finance-delta {
+  font-size: 8px;
+}
+
+.cr2-finance-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.cr2-finance-label {
+  font-size: 7px;
+  color: var(--cr2-gray);
+}
+
+.cr2-finance-value {
+  font-size: 10px;
+  color: var(--cr2-white);
+}
+
+/* 탭바 */
+.cr2-tab-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 720px;
+  height: 48px;
+  display: flex;
+  z-index: 10;
+}
+
+.cr2-tab {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.95);
+  border: 1px solid var(--cr2-green);
+  border-bottom: none;
+  color: var(--cr2-green);
+  font-family: 'Press Start 2P', 'Noto Sans KR', monospace;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cr2-tab:hover {
+  background: rgba(0, 170, 0, 0.08);
+  color: var(--cr2-lime);
+  border-color: var(--cr2-lime);
+  box-shadow: 0 0 8px var(--cr2-lime-glow);
+}
+
+.cr2-tab-active {
+  background: rgba(0, 255, 65, 0.08);
+  color: var(--cr2-lime);
+  border-color: var(--cr2-lime);
+  border-bottom: 2px solid var(--cr2-lime);
+  box-shadow: 0 0 10px var(--cr2-lime-glow);
+}
+
+.cr2-tab-rival {
+  border-color: var(--cr2-red);
+  color: var(--cr2-red);
+}
+
+.cr2-tab-rival:hover,
+.cr2-tab-rival.cr2-tab-active {
+  background: rgba(220, 20, 60, 0.1);
+  border-color: var(--cr2-red);
+  color: #ff6b6b;
+}
+
+.cr2-tab-next {
+  background: var(--cr2-lime) !important;
+  color: #000 !important;
+  border-color: var(--cr2-lime) !important;
+  font-size: 10px;
+}
+
+.cr2-tab-next:hover {
+  background: #00cc35 !important;
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.4);
+}
+
+/* 우측 패널 */
+.cr2-right-panel {
+  position: relative;
+  z-index: 1;
+  width: 360px;
+  height: calc(100% - 48px);
+  background: rgba(0, 0, 0, 0.88);
+  border-left: 1px solid var(--cr2-green);
+  box-shadow:
+    -4px 0 12px rgba(0, 255, 65, 0.1),
+    inset 4px 0 12px rgba(0, 255, 65, 0.03);
+  overflow-y: auto;
+  backdrop-filter: blur(4px);
+}
+
+/* 팝업 */
+.cr2-popup-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.cr2-stage-popup {
+  background: var(--cr2-bg2);
+  border: 2px solid var(--cr2-red);
+  padding: 24px;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 0 24px rgba(220, 20, 60, 0.3);
+}
+
+.cr2-learning-popup {
+  background: var(--cr2-bg2);
+  border: 2px solid var(--cr2-gold);
+  padding: 20px;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  text-align: center;
+}
+
+.cr2-stage-popup-title { font-size: 13px; color: var(--cr2-red); }
+.cr2-stage-popup-img { width: 80px; height: 80px; object-fit: contain; }
+.cr2-stage-popup-name { font-size: 13px; color: var(--cr2-lime); }
+.cr2-stage-popup-company { font-size: 9px; color: var(--cr2-gray); }
+.cr2-stage-popup-message { font-size: 11px; color: var(--cr2-white); line-height: 1.8; }
+.cr2-stage-popup-hint { font-size: 10px; color: var(--cr2-gold); }
+
+.cr2-learning-popup-title { font-size: 12px; color: var(--cr2-gold); }
+.cr2-learning-popup-hint { font-size: 11px; color: var(--cr2-white); line-height: 1.8; }
+.cr2-learning-popup-monopol { font-size: 9px; color: var(--cr2-gray); }
+.cr2-learning-popup-btns { display: flex; gap: 8px; }
+
+/* 대출 경고 */
+.cr2-loan-warning {
+  position: absolute;
+  top: 34px;
+  left: 8px;
+  background: rgba(220, 20, 60, 0.15);
+  border: 1px solid var(--cr2-red);
+  color: var(--cr2-red);
+  font-size: 8px;
+  padding: 3px 8px;
+  z-index: 5;
+}
+
+/* 라이벌 자본 바 */
+.cr2-main-left > .cr2-rival-capital-bar {
+  background: rgba(12, 4, 4, 0.95);
+  border-top: 1px solid var(--cr2-red);
+  padding: 6px 12px;
+  font-size: 9px;
+  margin: 0;
+  box-shadow: 0 -2px 8px var(--cr2-red-glow);
+}
+
+.cr2-main-left .cr2-rival-bar-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+
+.cr2-main-left .cr2-rival-bar-label { color: var(--cr2-red); font-weight: bold; }
+.cr2-main-left .cr2-rival-bar-name { color: var(--cr2-white); }
+
+.cr2-main-left .cr2-rival-bar-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(220, 20, 60, 0.2);
+  margin: 4px 0;
+}
+
+.cr2-main-left .cr2-rival-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #aa0000 0%, var(--cr2-red) 100%);
+  box-shadow: 0 0 8px var(--cr2-red-glow);
+  transition: width 0.4s;
+}
+
+.cr2-main-left .cr2-rival-bar-info {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* 라이벌 탭 패널 */
+.cr2-rival-tab-profile {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: rgba(220, 20, 60, 0.08);
+  border: 1px solid rgba(220, 20, 60, 0.3);
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+.cr2-rival-tab-img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px rgba(220, 20, 60, 0.4));
+}
+
+.cr2-rival-tab-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cr2-rival-tab-name { font-size: 13px; }
+.cr2-rival-tab-company { font-size: 9px; }
+.cr2-rival-tab-tier { font-size: 9px; }
+
+.cr2-rival-tab-section {
+  margin-bottom: 10px;
+}
+
+.cr2-rival-tab-section-title {
+  font-size: 9px;
+  color: var(--cr2-green);
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgba(0, 170, 0, 0.2);
+  padding-bottom: 3px;
+}
+
+.cr2-rival-cap-bar-track {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 4px 0;
+}
+
+.cr2-rival-cap-bar {
+  height: 100%;
+  transition: width 0.4s;
+}
+
+.cr2-rival-tab-cap-info {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 10px;
+}
+
+.cr2-rival-tab-ability,
+.cr2-rival-tab-intervention {
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.cr2-rival-tab-hint {
+  font-size: 10px;
+  color: var(--cr2-white);
+  line-height: 1.6;
+}
+
+.cr2-rival-tab-empty {
+  font-size: 10px;
+  text-align: center;
+  padding: 24px;
+}
+
+/* 공통 유틸 */
+.cr2-positive { color: var(--cr2-lime) !important; }
+.cr2-negative { color: var(--cr2-red) !important; }
+.cr2-gold { color: var(--cr2-gold) !important; }
+.cr2-gray { color: var(--cr2-gray) !important; }
+.cr2-lime { color: var(--cr2-lime) !important; }
+.cr2-white { color: var(--cr2-white) !important; }
+
+@keyframes cr2-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.cr2-blink {
+  animation: cr2-blink 0.8s ease infinite;
+}

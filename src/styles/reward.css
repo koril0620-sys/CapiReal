@@ -1,0 +1,50 @@
+.cr2-reward-screen {
+  width: 100%;
+  height: 100%;
+  background: var(--cr2-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+}
+
+.cr2-reward-grade {
+  font-size: 24px;
+  text-shadow: 0 0 20px currentColor;
+}
+
+.cr2-reward-title { font-size: 13px; color: var(--cr2-white); }
+
+.cr2-reward-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.cr2-reward-option {
+  background: var(--cr2-bg2);
+  border: 2px solid var(--cr2-green);
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.cr2-reward-option:hover { border-color: var(--cr2-lime); }
+.cr2-reward-option.cr2-selected { background: rgba(0,255,65,0.08); }
+
+.cr2-reward-option-label { font-size: 13px; color: var(--cr2-lime); margin-bottom: 4px; }
+.cr2-reward-option-desc { font-size: 10px; color: var(--cr2-gray); }
+
+.cr2-reward-confirm-btn {
+  background: var(--cr2-lime);
+  color: #000;
+  border-color: var(--cr2-lime);
+  padding: 12px 32px;
+  font-size: 13px;
+}
+
+.cr2-reward-confirm-btn:disabled { opacity: 0.4; cursor: not-allowed; }

@@ -1,0 +1,39 @@
+.cr2-loan-alert {
+  width: min(420px, calc(100% - 32px));
+  background: var(--cr2-bg2);
+  border: 2px solid var(--cr2-red);
+  padding: 18px;
+  color: var(--cr2-white);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 0 24px rgb(220 20 60 / 35%);
+}
+
+.cr2-loan-alert-title {
+  font-size: 13px;
+  text-align: center;
+}
+
+.cr2-loan-alert-info {
+  border: 1px solid rgb(255 255 255 / 12%);
+  background: rgb(0 0 0 / 35%);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.cr2-loan-alert-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cr2-loan-alert-btns .cr2-btn {
+  width: 100%;
+  white-space: normal;
+  line-height: 1.5;
+}

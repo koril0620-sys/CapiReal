@@ -1,0 +1,165 @@
+.cr2-login-screen {
+  width: 100%;
+  height: 100%;
+  background: var(--cr2-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.cr2-login-logo {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 36px;
+  color: var(--cr2-lime);
+  text-shadow: none;
+}
+
+.cr2-login-card {
+  background: rgba(4, 6, 4, 0.95);
+  border: 1px solid var(--cr2-lime);
+  padding: 32px;
+  width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 0 16px var(--cr2-lime-glow);
+}
+
+.cr2-login-title {
+  font-size: 20px;
+  color: var(--cr2-lime);
+  margin-bottom: 8px;
+}
+
+.cr2-login-label {
+  font-size: 11px;
+  color: var(--cr2-green);
+  margin-top: 4px;
+}
+
+.cr2-login-input {
+  background: #111;
+  border: 1px solid var(--cr2-green);
+  color: var(--cr2-white);
+  padding: 10px 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  width: 100%;
+}
+
+.cr2-login-input:focus {
+  outline: none;
+  border-color: var(--cr2-lime);
+  box-shadow: 0 0 6px var(--cr2-lime-glow);
+}
+
+.cr2-login-usertype {
+  display: flex;
+  gap: 8px;
+}
+
+.cr2-login-type-btn {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--cr2-green);
+  color: var(--cr2-green);
+  padding: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.cr2-login-type-btn.cr2-selected {
+  border-color: var(--cr2-lime);
+  color: var(--cr2-lime);
+  background: rgb(0 255 65 / 10%);
+}
+
+.cr2-login-type-hint {
+  font-size: 9px;
+  color: var(--cr2-gray);
+}
+
+.cr2-login-remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: var(--cr2-green);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.cr2-login-remember:hover {
+  color: var(--cr2-lime);
+}
+
+.cr2-login-error {
+  font-size: 10px;
+  color: var(--cr2-red);
+  padding: 4px 0;
+}
+
+.cr2-login-btns {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.cr2-login-main-btn {
+  font-family: 'Press Start 2P', sans-serif;
+  flex: 1;
+  background: var(--cr2-lime);
+  color: #000000;
+  border: 1px solid var(--cr2-lime);
+  box-shadow: 0 0 8px var(--cr2-lime-glow);
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+  cursor: pointer;
+}
+
+.cr2-login-main-btn:hover:not(:disabled) {
+  background: #00e63a;
+  box-shadow: 0 0 14px var(--cr2-lime-glow);
+}
+
+.cr2-login-main-btn:active:not(:disabled) {
+  transform: scale(0.97);
+  will-change: transform;
+}
+
+.cr2-login-main-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.cr2-guest-warning {
+  background: rgba(12, 10, 4, 0.95);
+  border: 1px solid var(--cr2-gold);
+  padding: 24px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 0 16px var(--cr2-gold-glow);
+}
+
+.cr2-guest-warning-title {
+  font-size: 13px;
+  color: var(--cr2-gold);
+}
+
+.cr2-guest-warning-text {
+  font-size: 10px;
+  color: var(--cr2-white);
+  line-height: 2;
+}
+
+.cr2-guest-warning-btns {
+  display: flex;
+  gap: 8px;
+}

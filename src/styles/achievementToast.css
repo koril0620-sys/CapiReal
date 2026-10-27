@@ -1,0 +1,32 @@
+@keyframes cr2-toast-in {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes cr2-toast-out {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(120%); opacity: 0; }
+}
+
+.cr2-toast {
+  position: absolute;
+  bottom: 60px;
+  right: 8px;
+  background: #1a1a2e;
+  border: 2px solid var(--cr2-gold);
+  padding: 10px 14px;
+  min-width: 200px;
+  z-index: 999;
+  animation: cr2-toast-in 0.3s ease forwards;
+}
+
+.cr2-toast.cr2-toast-leaving {
+  animation: cr2-toast-out 0.3s ease forwards;
+}
+
+.cr2-toast-header { font-size: 10px; color: var(--cr2-gold); margin-bottom: 6px; }
+.cr2-toast-body { display: flex; gap: 8px; align-items: center; }
+.cr2-toast-icon { width: 32px; height: 32px; object-fit: contain; }
+.cr2-toast-name { font-size: 11px; }
+.cr2-toast-grade { font-size: 9px; }
+.cr2-toast-desc { font-size: 9px; color: var(--cr2-gray); }

@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+KR:wght@400;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  -webkit-font-smoothing: antialiased;
+  image-rendering: pixelated;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000000;
+  color: #E0E0E0;
+  font-family: 'Press Start 2P', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+}
+
+#root {
+  width: 1080px;
+  height: 720px;
+  position: absolute;
+  overflow: hidden;
+  background: #000000;
+  color: #E0E0E0;
+  transform-origin: top left;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* 기본 텍스트 색상 강제 지정 — 배경색에 묻히지 않도록 */
+#root {
+  color: #E0E0E0;
+}
+
+/* 색상이 명시적으로 지정되지 않은 텍스트는 부모 색상 상속 */
+:where(#root p,
+#root div,
+#root span,
+#root li,
+#root td,
+#root th,
+#root label) {
+  color: inherit;
+}
+
+/* Antigravity가 배경을 파랗게 바꿔도 텍스트는 항상 밝게 */
+:where(#root [style*="background"]) {
+  color: #E0E0E0;
+}
+
+#root {
+  width: 1080px;
+  height: 720px;
+  position: absolute;
+  overflow: hidden;
+  background: #000000;
+  transform-origin: top left;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* CRT 극미세 스캔라인 오버레이 (opacity 0.01) */
+#root::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+  background-size: 100% 3px;
+  z-index: 99999;
+  pointer-events: none;
+  opacity: 0.01;
+}
+
+:root {
+  --cr2-bg: #000000;
+  --cr2-bg2: #08080c;
+  --cr2-green: #00aa00;
+  --cr2-lime: #00ff41;
+  --cr2-red: #dc143c;
+  --cr2-gold: #ffd700;
+  --cr2-white: #f0f0f0;
+  --cr2-gray: #a0a0b0;
+  
+  /* HSL/RGB 기반 단일 글로우 섀도우용 변수 */
+  --cr2-lime-glow: rgba(0, 255, 65, 0.25);
+  --cr2-red-glow: rgba(220, 20, 60, 0.25);
+  --cr2-gold-glow: rgba(255, 215, 0, 0.25);
+  --cr2-green-glow: rgba(0, 170, 0, 0.15);
+}
+
+.cr2-btn {
+  font-family: 'Press Start 2P', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  background: transparent;
+  border: 1px solid var(--cr2-lime);
+  color: var(--cr2-lime);
+  padding: 8px 16px;
+  box-shadow: 0 0 5px var(--cr2-lime-glow);
+  transition: background 0.15s, box-shadow 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.cr2-btn:hover {
+  background: rgba(0, 255, 65, 0.08);
+  box-shadow: 0 0 12px var(--cr2-lime-glow);
+  border-color: #00ff66;
+}
+
+.cr2-btn:active {
+  transform: scale(0.97);
+  will-change: transform;
+}
+
+.cr2-scrollable {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cr2-scrollable::-webkit-scrollbar {
+  width: 5px;
+}
+
+.cr2-scrollable::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.cr2-scrollable::-webkit-scrollbar-thumb {
+  background: var(--cr2-green);
+  border-radius: 2px;
+  border: 1px solid var(--cr2-bg);
+}
+
+.cr2-scrollable::-webkit-scrollbar-thumb:hover {
+  background: var(--cr2-lime);
+}
+
+/* 전체 스크롤바 커스텀 */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cr2-green);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cr2-lime);
+  box-shadow: 0 0 4px var(--cr2-lime);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}

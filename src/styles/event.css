@@ -1,0 +1,77 @@
+.cr2-event-screen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cr2-bg);
+  position: relative;
+}
+
+.cr2-event-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.3);
+}
+
+.cr2-event-card {
+  position: relative;
+  z-index: 1;
+  background: rgb(0 0 0 / 90%);
+  border: 2px solid var(--cr2-gold);
+  padding: 24px;
+  max-width: 600px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cr2-event-external { border-color: var(--cr2-red); }
+.cr2-event-internal { border-color: var(--cr2-gold); }
+
+.cr2-event-badge {
+  font-size: 9px;
+  padding: 3px 8px;
+  border: 1px solid currentColor;
+  width: fit-content;
+}
+
+.cr2-badge-external { color: var(--cr2-red); }
+.cr2-badge-internal { color: var(--cr2-gold); }
+
+.cr2-event-title { font-size: 20px; color: var(--cr2-white); }
+.cr2-event-desc { font-size: 12px; color: var(--cr2-gray); }
+.cr2-event-effect { font-size: 11px; color: var(--cr2-red); }
+
+.cr2-event-choices { display: flex; flex-direction: column; gap: 8px; }
+
+.cr2-event-choice {
+  border: 1px solid var(--cr2-green);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.cr2-event-choice:hover { border-color: var(--cr2-lime); }
+.cr2-event-choice.cr2-selected { border-color: var(--cr2-lime); background: rgb(0 255 65 / 8%); }
+
+.cr2-choice-safe { border-color: var(--cr2-lime); }
+.cr2-choice-normal { border-color: var(--cr2-green); }
+.cr2-choice-gamble { border-color: var(--cr2-gold); }
+.cr2-choice-absurd { border-color: var(--cr2-red); }
+
+.cr2-choice-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.cr2-choice-label { font-size: 10px; color: var(--cr2-lime); }
+.cr2-choice-prob { font-size: 9px; color: var(--cr2-gray); }
+.cr2-choice-desc { font-size: 11px; color: var(--cr2-white); }
+
+.cr2-event-confirm-btn {
+  background: var(--cr2-lime);
+  color: #000;
+  border-color: var(--cr2-lime);
+  width: 100%;
+  padding: 10px;
+}

@@ -1,0 +1,30 @@
+.cr2-rivaldex-screen {
+  width: 100%;
+  height: 100%;
+  background: var(--cr2-bg);
+  padding: 16px;
+}
+
+.cr2-rivaldex-header { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+.cr2-rivaldex-title { font-size: 16px; color: var(--cr2-lime); }
+.cr2-rivaldex-progress { font-size: 11px; color: var(--cr2-white); margin-bottom: 12px; }
+
+.cr2-rivaldex-list { display: flex; flex-direction: column; gap: 8px; }
+
+.cr2-rivaldex-item {
+  display: flex;
+  gap: 12px;
+  background: var(--cr2-bg2);
+  border: 1px solid var(--cr2-green);
+  padding: 10px 12px;
+  align-items: center;
+}
+
+.cr2-rivaldex-met { border-color: var(--cr2-lime); }
+.cr2-rivaldex-unknown { border-color: rgba(0,170,0,0.3); }
+
+.cr2-rivaldex-img { width: 48px; height: 48px; object-fit: contain; }
+.cr2-rivaldex-tier { font-size: 9px; }
+.cr2-rivaldex-name { font-size: 12px; color: var(--cr2-white); }
+.cr2-rivaldex-company { font-size: 9px; }
+.cr2-rivaldex-quote { font-size: 9px; font-style: italic; margin-top: 4px; }

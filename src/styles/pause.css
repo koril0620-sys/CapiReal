@@ -1,0 +1,48 @@
+.cr2-pause-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.cr2-pause-menu {
+  background: var(--cr2-bg2);
+  border: 2px solid var(--cr2-red);
+  padding: 24px 32px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cr2-pause-title { font-size: 20px; color: var(--cr2-lime); text-align: center; margin-bottom: 4px; }
+.cr2-pause-floor { font-size: 10px; color: var(--cr2-gray); text-align: center; margin-bottom: 8px; }
+
+.cr2-pause-divider { height: 1px; background: var(--cr2-green); margin: 8px 0; }
+
+.cr2-pause-item {
+  background: transparent;
+  border: none;
+  color: var(--cr2-green);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  padding: 8px 4px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.cr2-pause-item:hover { color: var(--cr2-lime); }
+.cr2-pause-danger { color: var(--cr2-red); }
+.cr2-pause-ghost { color: var(--cr2-gray); }
+
+.cr2-pause-resume-btn {
+  background: var(--cr2-lime);
+  color: #000;
+  border-color: var(--cr2-lime);
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+}

@@ -1,0 +1,33 @@
+.cr2-ending-screen {
+  width: 100%;
+  height: 100%;
+  background: var(--cr2-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.cr2-ending-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.cr2-ending-intro { justify-content: center; }
+.cr2-ending-main-title { font-size: 20px; }
+.cr2-ending-main-img { width: 200px; height: 150px; object-fit: cover; border: 2px solid var(--cr2-gold); }
+.cr2-ending-grade { font-size: 28px; font-weight: bold; }
+.cr2-ending-message { font-size: 11px; color: var(--cr2-white); }
+.cr2-ending-advisor-img { width: 48px; height: 48px; object-fit: contain; }
+.cr2-ending-final-stats { font-size: 12px; }
+.cr2-ending-page-title { font-size: 14px; color: var(--cr2-lime); }
+.cr2-ending-stats { width: 100%; }
+.cr2-ending-rivals-title { font-size: 11px; color: var(--cr2-green); margin-bottom: 8px; }
+.cr2-ending-rivals-list { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.cr2-ending-rival-sprite { width: 40px; height: 40px; object-fit: contain; filter: grayscale(20%); }
+.cr2-ending-save-desc { font-size: 11px; color: var(--cr2-white); }
+.cr2-ending-save-btn { background: var(--cr2-lime); color: #000; border-color: var(--cr2-lime); padding: 10px 24px; }
+.cr2-ending-final-btns { display: flex; gap: 8px; margin-top: 16px; }
