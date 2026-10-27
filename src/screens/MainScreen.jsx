@@ -21,7 +21,6 @@ import { closeMarket } from '../logic/floorEngine'
 import { commitSettlement, ensureFloorEntered } from '../logic/turnFlow'
 import RightPanel from '../components/RightPanel'
 import MarketBoard from '../components/MarketBoard'
-import MarketStreet from '../components/MarketStreet'
 import RivalCapitalBar from '../components/RivalCapitalBar'
 import CheatPanel from '../components/CheatPanel'
 import '../styles/main.css'
@@ -258,7 +257,6 @@ export default function MainScreen() {
 
         <div className="cr2-game-area">
           <MarketBoard onSelect={() => setActiveTab('sale')} />
-          <MarketStreet />
 
           {isBossStage(gameState.floor) && (
             <div className="cr2-boss-round-badge">
