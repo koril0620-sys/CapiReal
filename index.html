@@ -173,6 +173,11 @@ kbd{font-family:var(--mono);font-size:11.5px;background:var(--panel-2);border:1p
 .ct-bars div{height:8px;border-radius:4px}
 .contract-box{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--panel-2)}
 .opt .lines{display:grid;gap:2px;margin-top:4px}
+.opt .lines .ct-perk{color:var(--good)}
+.opt .lines .ct-limit{color:var(--warn)}
+.opt .lines .ct-concept{color:var(--rival)}
+.ct-tag{display:inline-block;margin-left:6px;font-size:11px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:0 7px;vertical-align:2px}
+.ct-now{font-size:12px;color:var(--fg);background:var(--panel);border-radius:6px;padding:4px 8px}
 footer{color:var(--muted);font-size:12px;max-width:1180px;margin:4px auto 0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 .sound-wrap{position:relative;display:inline-flex}
@@ -672,9 +677,15 @@ const ADVISORS = {
 };
 const CONTRACTS = {
   none:    { name: '계약 없음', goal: '추가 목표 없이 생존과 최종 등급만 본다.', fail: '' },
-  nodebt:  { name: '무차입 경영', goal: '12개월 동안 은행 대출과 긴급 운전자금을 한 번도 쓰지 않는다.', fail: '대출을 받거나 월말 현금이 모자라 긴급 차입이 생기면 그 순간 실패.' },
-  premium: { name: '프리미엄 브랜드', goal: '1년 평균 판매가를 경쟁사 평균보다 높게 유지한다.', fail: '12개월이 끝났을 때 내 평균가가 경쟁사 이하이면 실패.' },
-  expand:  { name: '불황 속 확장', goal: '경기가 위축·불황인 날들의 평균 점유율을 50% 이상으로 만든다 (가게가 늘면 공정 몫 기준).', fail: '그 기간 평균 점유율이 50% 미만이면 실패.' },
+  nodebt:  { name: '무차입 경영', tag: '보수적 재무', concept: '기회비용 · 이자', goal: '12개월 동안 은행 대출과 긴급 운전자금을 한 번도 쓰지 않는다.', fail: '대출을 받거나 월말 현금이 모자라 긴급 차입이 생기면 그 순간 실패.',
+    perks: ['주주 출자로 시작 현금 +300만', '빚이 없는 동안 월말 현금에 예금 이자 월 0.3%', '6개월 무차입이면 "탄탄한 가게" 소문 → 브랜드 +5'],
+    limits: ['계약이 깨지면 신용등급 한 단계 하락 · 예금 이자 끊김'] },
+  premium: { name: '프리미엄 브랜드', tag: '고급화 · 차별화', concept: '제품 차별화 · 가격 탄력성', goal: '1년 평균 판매가를 경쟁사 평균보다 높게 유지한다.', fail: '12개월이 끝났을 때 내 평균가가 경쟁사 이하이면 실패.',
+    perks: ['시작 브랜드 +10', '품질형·유행형 손님에게 매력 +8%', '6개월 평균가가 경쟁사보다 높으면 "프리미엄 인증" → 브랜드 +6'],
+    limits: ['알뜰형 손님에게 매력 −10%', '경쟁사 평균가보다 싸게 판 날마다 브랜드 −0.4'] },
+  expand:  { name: '불황 속 확장', tag: '역발상 투자', concept: '경기 순환 · 경기 역행 투자', goal: '경기가 위축·불황인 날들의 평균 점유율을 50% 이상으로 만든다 (가게가 늘면 공정 몫 기준).', fail: '그 기간 평균 점유율이 50% 미만이면 실패.',
+    perks: ['대출 한도 +1,000만', '위축·불황 때 투자 비용 −20%', '위축·불황 때 알뜰형·단골 손님에게 매력 +10%', '위축·불황인 달을 공정 몫 이상으로 처음 버티면 브랜드 +5'],
+    limits: ['호황·성장 때 고정비 +10% (넓힌 매장 유지비)'] },
 };
 /* 경쟁사 뉴웨이브 상사의 대표: 난도에 따라 MONOPOL 조직원이 맡는다 */
 const RIVAL_CEO = {
@@ -819,6 +830,22 @@ const INV = {
   member:  { cost: 4000000, label: '단골 멤버십', effect: '브랜드 +4', extra: '5개월간 브랜드 안 줄어듦', apply(me) { me.B += 4; me.memberUntil = Math.max(me.memberUntil || 0, S.g + 25); } },
 };
 const invDelay = kind => INV[kind].half ? Math.ceil(D().delay / 2) : D().delay;
+/* 경영 계약 효과 */
+const hasC = c => S && S.cfg.contract === c;
+const inRecession = () => S.phase >= 3;
+const contractAlive = () => !(hasC('nodebt') && S.me.everBorrowed);
+// 불황 속 확장: 위축·불황 때 투자 20% 할인
+const invCost = kind => Math.round(INV[kind].cost * (hasC('expand') && inRecession() ? 0.8 : 1));
+// 불황 속 확장: 호황·성장 때 고정비 +10%
+const fixedCost = () => FIXED * (hasC('expand') && S.phase <= 1 ? 1.1 : 1);
+// 불황 속 확장: 대출 한도 +1,000만
+const creditLimit = () => CREDIT[S.me.credit].limit + (hasC('expand') && CREDIT[S.me.credit].limit > 0 ? 10000000 : 0);
+// 손님 유형별 내 가게 매력 보정
+function contractSegMod() {
+  if (hasC('premium')) return { quality: 1.08, trend: 1.08, thrift: 0.9 };
+  if (hasC('expand') && inRecession()) return { thrift: 1.1, loyal: 1.1 };
+  return null;
+}
 const unitCost = Q => 5000 + 500 * Q;
 const attract = (p, Q, B, e) => Math.pow(Q, 0.8) * (1 + B / 100) * Math.pow(REF / p, e);
 
@@ -985,10 +1012,10 @@ function segProbs(sg, stores, ph) {
   if (sg.loyal) {
     // 단골: 다니던 가게(단골 비중)로 간다. 15% 넘게 비싸지거나 품질이 크게 밀리면 조금씩 떠난다
     const minP = Math.min(...stores.map(x => x.p)), maxQ = Math.max(...stores.map(x => x.Q));
-    w = stores.map(x => x.L * (x.p > minP * 1.15 ? 0.6 : 1) * (x.Q < maxQ - 1.5 ? 0.75 : 1) * Math.pow(REF / x.p, ph.elas * 0.3) * x.mod);
+    w = stores.map(x => x.L * (x.p > minP * 1.15 ? 0.6 : 1) * (x.Q < maxQ - 1.5 ? 0.75 : 1) * Math.pow(REF / x.p, ph.elas * 0.3) * x.mod * ((x.seg && x.seg.loyal) || 1));
     if (!(w.reduce((a, b) => a + b, 0) > 0)) return segProbs(SEGS[4], stores, ph);
   } else {
-    w = stores.map(x => { const a = Math.pow(x.Q, sg.qExp) * (1 + sg.bMul * x.B / 100) * Math.pow(REF / x.p, ph.elas * sg.elasMul) * x.mod * (x.style === sg.focus ? 1.1 : 1); return a * a; });
+    w = stores.map(x => { const a = Math.pow(x.Q, sg.qExp) * (1 + sg.bMul * x.B / 100) * Math.pow(REF / x.p, ph.elas * sg.elasMul) * x.mod * ((x.seg && x.seg[sg.key]) || 1) * (x.style === sg.focus ? 1.1 : 1); return a * a; });
   }
   const t = w.reduce((a, b) => a + b, 0); return w.map(x => x / t);
 }
@@ -1064,6 +1091,8 @@ function newGame(cfg) {
   // 예전엔 고정이던 것들도 시장 번호에 따라 정한다: 뉴웨이브 첫 능력치, 정기 이벤트 날짜, 새 경쟁사 시기
   const r5 = (a, b) => a + Math.floor(rand5() * (b - a + 1));
   const nwBase = r5(116, 124) * 100;
+  if (cfg.contract === 'nodebt') { S.me.cash += 3000000; S.startCash += 3000000; }
+  if (cfg.contract === 'premium') S.me.B += 10;
   S.main = mkRival({ name: '뉴웨이브', key: 'newwave', style: 'main', colors: MAIN_COLORS, ceo: CEO(), base: nwBase, floor: nwBase - 1500, cap: nwBase + 2500,
     Q: r5(45, 55) / 10, B: r5(25, 35), cash: r5(40, 50) * 1000000, openedAt: 0, loyal: 0.5 });
   S.shownRp = nwBase;
@@ -1118,7 +1147,7 @@ function engineTick() {
   const ph = PHASES[S.phase], me = S.me, m = S.mon;
   const open = openRivals(), n = 1 + open.length;
   // 이 거리의 가게들 (0번 = 내 가게)
-  const stores = [{ r: null, p: me.price, Q: me.Q, B: me.B, mod: effMul('meAttract') * me.storeMod, style: 'me', L: me.loyal * (me.memberUntil > S.g ? 1.5 : 1) }]
+  const stores = [{ r: null, p: me.price, Q: me.Q, B: me.B, mod: effMul('meAttract') * me.storeMod, seg: contractSegMod(), style: 'me', L: me.loyal * (me.memberUntil > S.g ? 1.5 : 1) }]
     .concat(open.map(r => ({ r, p: priceOf(r), Q: r.Q, B: r.B, mod: 1, style: r.style, L: r.loyal })));
   const avgP = stores.reduce((s, x) => s + x.p, 0) / n;
   const tf = clamp(Math.pow(REF / avgP, 0.6), 0.5, 1.5);
@@ -1199,6 +1228,11 @@ function endDay() {
     if (rv.cooldown > 0) rv.cooldown--;
   }
   S.shownRp = rivalPrice();
+  // 프리미엄 브랜드: 경쟁사 평균가보다 싸게 판 날은 고급 이미지가 깎인다
+  if (hasC('premium') && openRivals().length && me.price < rivalPrice()) {
+    me.B = Math.max(0, me.B - 0.4);
+    if (!S.premWarn) { S.premWarn = true; news('프리미엄 브랜드 계약: 경쟁사보다 싸게 팔아 고급 이미지가 깎이고 있다 (하루 브랜드 −0.4).', 'bad'); hooks.toast?.('프리미엄 이미지가 깎이는 중 — 경쟁사 평균가보다 싸다'); }
+  } else S.premWarn = false;
   S.g++;
   if (me.supplierUntil >= 0 && S.g >= me.supplierUntil) { me.supplier = 1; me.supplierUntil = -1; news('원자재 단가가 이전 수준으로 돌아왔다.'); }
   for (const e of S.effects.filter(e => e.until <= S.g)) news(`'${e.label.split(' · ')[0]}' 영향이 끝났다.`);
@@ -1356,10 +1390,13 @@ function pickPhase(prev) {
 function endMonth() {
   const me = S.me, m = S.mon, d = D();
   const mNo = S.months.length + 1;
-  me.cash -= FIXED; m.fixed += FIXED;
+  const myFixed = fixedCost();
+  me.cash -= myFixed; m.fixed += myFixed;
   for (const r of openRivals()) r.cash -= FIXED;
   const intr = me.debt * Math.max(0.002, 0.01 + d.rateAdd / 12 + effSum('rate')) + me.emerg * EMERG_RATE;
   me.cash -= intr; m.interest += intr;
+  // 무차입 경영: 빚이 없는 동안 월말 현금에 예금 이자
+  if (hasC('nodebt') && !me.everBorrowed && me.cash > 0) { const dep = Math.round(me.cash * 0.003); me.cash += dep; m.deposit = (m.deposit || 0) + dep; }
   if (S.g >= (me.memberUntil || 0)) me.B = Math.max(0, me.B - 1.5);
   for (const r of openRivals()) r.B = Math.max(0, r.B - 1.5);
   if (me.cash < 0) {
@@ -1369,7 +1406,7 @@ function endMonth() {
     if (me.credit < 3) me.credit++;
     news(`현금이 모자라 긴급 운전자금 ${fmtM(need)}을 자동으로 빌렸다 (월 2.5%). 신용등급 하락.`, 'bad'); hooks.tip('emerg');
   }
-  const op = m.rev - m.var - m.fixed - m.interest;
+  const op = m.rev - m.var - m.fixed - m.interest + (m.deposit || 0);
   const capital = me.cash - me.debt - me.emerg;
   me.streak = capital < 0 ? me.streak + 1 : 0;
   const share = m.ticks ? m.shareSum / m.ticks : 0, rel = m.ticks ? m.relSum / m.ticks : 0, nAvg = m.ticks ? m.nSum / m.ticks : 2;
@@ -1392,7 +1429,9 @@ function endMonth() {
     visitors: m.visitors, buyers: m.buyers, units: m.units, meVisit: m.meVisit, meBuy: m.meBuy,
     segShare: Object.fromEntries(SEGS.map(sg => [sg.key, m.seg[sg.key].all > 0 ? m.seg[sg.key].me / m.seg[sg.key].all : 0])),
     segMix: Object.fromEntries(SEGS.map(sg => [sg.key, m.visitors > 0 ? m.seg[sg.key].visit / m.visitors : 0])), price: m.priceSum / m.ticks, rp: m.rpSum / m.ticks, phase: prev, next: S.phase, health: me.health, dh, Q: me.Q, B: me.B, rvQ: lead.Q, rvB: lead.B, emerg: m.emerg, streak: me.streak };
+  row.deposit = m.deposit || 0;
   S.months.push(row);
+  contractMilestones(row);
   S.mon = blankMon();
   if (prev !== S.phase) { news(`경기가 '${PHASES[prev].name}'에서 '${PHASES[S.phase].name}'(으)로 바뀌었다.`, 'phase'); hooks.tip('phase'); }
   if (!closedNow) { if (rel > 0.6) rivalSay('leading'); else if (rel < 0.4) rivalSay('trailing'); }
@@ -1402,6 +1441,17 @@ function endMonth() {
   hooks.banner(row);
 }
 
+// 경영 계약 중간 보상
+function contractMilestones(row) {
+  const me = S.me, c = S.cfg.contract, give = (text, fn) => { fn(); news(text, 'good'); hooks.toast?.('📜 ' + text); };
+  if (c === 'nodebt' && row.m === 6 && !me.everBorrowed) give('무차입 6개월 달성: "빚 없이 버티는 탄탄한 가게"라는 소문이 났다. 브랜드 +5.', () => { me.B += 5; });
+  if (c === 'premium' && row.m === 6) {
+    const a = avg(S.months.map(r => r.price)), b = avg(S.months.map(r => r.rp));
+    if (a > b) give(`프리미엄 인증 획득: 6개월 평균가 ${fmtWon(a)}가 경쟁사 평균 ${fmtWon(b)}보다 높다. 브랜드 +6.`, () => { me.B += 6; });
+    else news(`프리미엄 인증 실패: 6개월 평균가 ${fmtWon(a)}가 경쟁사 평균 ${fmtWon(b)} 이하다.`, 'bad');
+  }
+  if (c === 'expand' && !S.expandBonus && row.phase >= 3 && row.rel >= 0.5) { S.expandBonus = true; give(`불황 속 확장: ${row.m}월 ${PHASES[row.phase].name}에도 공정 몫 이상을 지켰다. 브랜드 +5.`, () => { me.B += 5; }); }
+}
 function healthDelta(op, emerg, share) {
   let dh = op > 0 ? 4 : op > -2000000 ? -6 : op > -5000000 ? -10 : -15;
   if (emerg) dh -= 6;
@@ -1415,7 +1465,7 @@ function projectedMonth() {
   const gross = m.rev - m.var;
   const rate = m.ticks >= 2 ? gross / m.ticks : lastRow ? (lastRow.rev - lastRow.var) / (DPM * TICKS) : 0;
   const intr = me.debt * Math.max(0.002, 0.01 + D().rateAdd / 12 + effSum('rate')) + me.emerg * EMERG_RATE;
-  const opEst = gross + rate * left - FIXED - intr;
+  const opEst = gross + rate * left - fixedCost() - intr;
   return { gross, opEst, intr, rev: m.rev };
 }
 
@@ -1433,19 +1483,20 @@ function invest(kind) {
   const it = INV[kind], me = S.me;
   if (S.pending.some(p => p.who === 'me' && p.kind === kind)) return '이미 진행 중이다.';
   const blocked = it.block && it.block(me); if (blocked) return blocked;
-  if (me.cash < it.cost) return `현금이 부족하다. ${fmtM(it.cost)}이 필요하다.`;
+  const cost = invCost(kind);
+  if (me.cash < cost) return `현금이 부족하다. ${fmtM(cost)}이 필요하다.`;
   const delay = invDelay(kind);
-  me.cash -= it.cost; S.mon.invest += it.cost;
+  me.cash -= cost; S.mon.invest += cost;
   S.pending.push({ who: 'me', kind, at: S.g + delay, start: S.g });
-  S.decisions.push({ g: S.g, kind, text: `${it.label} 착수 (${fmtM(it.cost)})` });
+  S.decisions.push({ g: S.g, kind, text: `${it.label} 착수 (${fmtM(cost)})` + (cost < it.cost ? ' · 불황기 할인' : '') });
   news(`${it.label}에 착수했다. ${delay}일 뒤 효과가 나타난다.`, 'me');
   return null;
 }
 function borrow() {
-  const me = S.me, lim = CREDIT[me.credit].limit;
+  const me = S.me, lim = creditLimit();
   if (me.debt + 10000000 > lim) return `신용 ${CREDIT[me.credit].g} 한도 ${fmtM(lim)}를 넘는다.`;
   if (!me.everBorrowed) S.borrowedAt = S.g;
-  if (S.cfg.contract === 'nodebt' && !me.everBorrowed) news('무차입 경영 계약 실패: 은행 대출을 받았다.', 'bad');
+  if (S.cfg.contract === 'nodebt' && !me.everBorrowed) { worsenCredit(); news('무차입 경영 계약 실패: 은행 대출을 받았다. 약속을 어겨 신용등급이 내려갔다.', 'bad'); }
   me.debt += 10000000; me.cash += 10000000; me.everBorrowed = true;
   S.decisions.push({ g: S.g, kind: 'loan', text: '대출 1,000만' });
   news('은행에서 1,000만을 빌렸다.', 'me'); hooks.tip('loan');
@@ -1792,7 +1843,7 @@ hooks.banner = row => {
   pc.textContent = row.next !== row.phase ? `다음 달 경기: ${PHASES[row.phase].name} → ${PHASES[row.next].name}` : `다음 달 경기: ${PHASES[row.next].name} 유지`;
   pc.className = 'chip ph-' + row.next;
   kv(el('stPL'), [
-    ['매출', fmtM(row.rev)], ['원가(변동비)', '−' + fmtM(row.var)], ['고정비', '−' + fmtM(row.fixed)], ['이자', man(row.interest) ? '−' + fmtM(row.interest) : '0만'],
+    ['매출', fmtM(row.rev)], ['원가(변동비)', '−' + fmtM(row.var)], ['고정비', '−' + fmtM(row.fixed)], ['이자', man(row.interest) ? '−' + fmtM(row.interest) : '0만'], ...(row.deposit ? [['예금 이자 (무차입 계약)', '+' + fmtM(row.deposit), 'pos']] : []),
     ['영업이익', fmtS(row.op), row.op >= 0 ? 'pos' : 'neg'], ['투자·기타 지출', row.invest ? '−' + fmtM(row.invest) : '0만'],
   ]);
   kv(el('stState'), [
@@ -1867,11 +1918,11 @@ function updateHUD() {
   const capital = me.cash - me.debt - me.emerg;
   el('capital').textContent = fmtM(capital); el('capital').className = 'val' + (capital < 0 ? ' neg' : '');
   el('debt').textContent = fmtM(me.debt + me.emerg) + (me.emerg > 0 ? ` (긴급 ${fmtM(me.emerg)})` : '');
-  el('credit').textContent = `${CREDIT[me.credit].g} · 한도 ${fmtM(CREDIT[me.credit].limit)}`;
+  el('credit').textContent = `${CREDIT[me.credit].g} · 한도 ${fmtM(creditLimit())}`;
   const er = el('erosion'); er.textContent = `자본 잠식 ${me.streak}/4`; er.className = 'pill' + (me.streak >= 2 ? ' bad' : me.streak === 1 ? ' warn' : '');
   const pm = projectedMonth();
   el('mRev').textContent = fmtM(pm.rev); el('mGross').textContent = fmtM(pm.gross);
-  el('mFixed').textContent = fmtM(FIXED + pm.intr);
+  el('mFixed').textContent = fmtM(fixedCost() + pm.intr);
   el('mOp').textContent = fmtS(pm.opEst); el('mOp').className = 'val ' + (pm.opEst >= 0 ? 'pos' : 'neg');
   el('shareNow').textContent = pct(S.lastShare ?? 0.5);
   el('health').textContent = Math.round(me.health);
@@ -1934,8 +1985,9 @@ function updateHUD() {
     const ip = S.pending.find(p => p.who === 'me' && p.kind === k), bl = it.block && it.block(me);
     el('inv-' + k + '-note').textContent = ip ? `진행 중 · ${ip.at - S.g}일 뒤 효과` : bl ? bl : `${it.effect} · ${invDelay(k)}일 뒤` + (it.extra && !it.half ? ` · ${it.extra}` : '');
     el(INV_BTN[k]).disabled = !!ip || !!bl;
+    const ic = invCost(k); el('inv-' + k + '-label').textContent = `${it.label} · ${fmtM(ic)}` + (ic < it.cost ? ' (불황 할인)' : '');
   }
-  el('loanNote').textContent = `신용 ${CREDIT[me.credit].g} · 대출 ${fmtM(me.debt)}/${fmtM(CREDIT[me.credit].limit)} · 월 ${((0.01 + d.rateAdd / 12) * 100).toFixed(2)}%`;
+  el('loanNote').textContent = `신용 ${CREDIT[me.credit].g} · 대출 ${fmtM(me.debt)}/${fmtM(creditLimit())} · 월 ${((0.01 + d.rateAdd / 12) * 100).toFixed(2)}%`;
   el('repayNote').textContent = me.emerg > 0 ? `긴급 운전자금 ${fmtM(me.emerg)}부터 갚는다` : `남은 대출 ${fmtM(me.debt)}`;
   el('lockveil').hidden = !(locked() && !S.ended && !pauses.has('start'));
   // advisor
@@ -1998,6 +2050,14 @@ function contractState() {
   if (S.ended && c !== 'none') { const ok = evaluate().contractOk; st.status = ok ? 'ok' : 'fail'; st.statusText = ok ? '성공' : '실패'; }
   return st;
 }
+// 지금 적용 중인 계약 효과 한 줄
+function contractNow() {
+  const c = S.cfg.contract, me = S.me;
+  if (c === 'nodebt') return contractAlive() ? `적용 중: 예금 이자 월 0.3% (지금 현금이면 월 +${fmtM(Math.max(0, me.cash) * 0.003)})` : '계약이 깨져 예금 이자가 끊겼다.';
+  if (c === 'premium') { const rp = rivalPrice(); return me.price < rp ? `주의: 오늘 경쟁사 평균가 ${fmtWon(rp)}보다 싸게 팔고 있다 → 하루 브랜드 −0.4` : `적용 중: 품질형·유행형 +8% · 알뜰형 −10% · 오늘 경쟁사 평균가 ${fmtWon(rp)} 이상이라 이미지 유지`; }
+  if (c === 'expand') return inRecession() ? '지금 위축·불황: 투자 20% 할인 · 알뜰형·단골 +10%' : S.phase <= 1 ? '지금 호황·성장: 고정비 +10% (990만)' : '지금 평시: 추가 효과 없음 · 대출 한도 +1,000만';
+  return '';
+}
 function renderContract(box, compact) {
   box.innerHTML = '';
   if (S.cfg.contract === 'none') { box.innerHTML = '<div class="note">계약 없이 시작했다. 생존과 최종 등급만 본다.</div>'; return; }
@@ -2027,6 +2087,7 @@ function renderContract(box, compact) {
     wrap.append(g);
   }
   const det = document.createElement('div'); det.className = 'ct-detail'; det.textContent = st.detail; wrap.append(det);
+  const now = contractNow(); if (now && !S.ended) { const nw = document.createElement('div'); nw.className = 'ct-now'; nw.textContent = now; wrap.append(nw); }
   const foot = document.createElement('div'); foot.className = 'note'; foot.textContent = compact ? '성공하면 최종 등급 한 단계 상승' : `실패 조건: ${st.fail} 성공하면 최종 등급이 한 단계 오른다.`; wrap.append(foot);
   box.append(wrap);
 }
@@ -2041,7 +2102,7 @@ const INV_BTN = {};
 for (const [k, it] of Object.entries(INV)) {
   const id = k === 'q' ? 'btnQ' : k === 'mkt' ? 'btnM' : 'btnInv-' + k; INV_BTN[k] = id;
   const b = document.createElement('button'); b.className = 'btn'; b.type = 'button'; b.id = id;
-  const t = document.createElement('span'); t.textContent = `${it.label} · ${fmtM(it.cost)}`;
+  const t = document.createElement('span'); t.id = 'inv-' + k + '-label'; t.textContent = `${it.label} · ${fmtM(it.cost)}`;
   const n = document.createElement('small'); n.id = 'inv-' + k + '-note'; n.textContent = it.effect;
   b.append(t, n); b.addEventListener('click', () => act(() => invest(k)));
   el('invGrid').append(b);
@@ -2309,10 +2370,14 @@ renderAlloc();
   for (const [k, v] of Object.entries(CONTRACTS)) {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'opt'; b.id = `contract-${k}`; b.setAttribute('aria-pressed', String(pick.contract === k));
     const t = document.createElement('b'); t.textContent = v.name;
+    if (v.tag) { const tg = document.createElement('span'); tg.className = 'ct-tag'; tg.textContent = v.tag; t.append(tg); }
     const lines = document.createElement('span'); lines.className = 'lines';
-    const add = (txt) => { const s = document.createElement('small'); s.textContent = txt; lines.append(s); };
+    const add = (txt, cls) => { const s = document.createElement('small'); s.textContent = txt; if (cls) s.className = cls; lines.append(s); };
     add('목표: ' + v.goal);
+    for (const x of v.perks || []) add('＋ ' + x, 'ct-perk');
+    for (const x of v.limits || []) add('－ ' + x, 'ct-limit');
     if (v.fail) { add('실패: ' + v.fail); add('보상: 성공하면 최종 등급 +1'); }
+    if (v.concept) add('경제 개념: ' + v.concept, 'ct-concept');
     b.append(t, lines);
     b.addEventListener('click', () => { pick.contract = k; box.querySelectorAll('.opt').forEach(o => o.setAttribute('aria-pressed', String(o === b))); });
     box.append(b);
