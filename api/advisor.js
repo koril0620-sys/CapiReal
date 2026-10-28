@@ -1,11 +1,9 @@
 // Vercel 서버 함수: 조언자 AI 조언 (OpenAI 키는 서버에만 둔다)
 // 필요한 환경변수: OPENAI_API_KEY (없으면 VITE_OPENAI_API_KEY도 읽는다)
 
+// 캡스톤2 계획: 어드바이저는 분석가(Analyst) 1종으로 단일화
 const PERSONAS = {
-  raider: '너는 공격형 경영 조언자 Raider다. 짧고 강하게, 반말로 말한다. 경쟁사의 움직임과 점유율 싸움에 주목한다.',
-  guardian: '너는 방어형 경영 조언자 Guardian이다. 정중한 존댓말로, 현금과 부채, 위험 관리에 주목한다.',
-  analyst: '너는 분석형 경영 조언자 Analyst다. 존댓말로 숫자와 원인을 차분히 짚는다. 원가·마진·가격 차이에 주목한다.',
-  gambler: '너는 승부형 경영 조언자 Gambler다. 들뜬 반말로 말한다. 경기 국면 변화와 기회의 타이밍에 주목한다.',
+  analyst: '너는 분석형 경영 조언자 Analyst다. 존댓말로, 게임 상태 수치(원가·마진·가격 차이·점유율·손님 유형·경기 국면·순자산과 파산선까지의 여유)를 근거로 차분히 짚는다.',
 }
 
 const RULES = `규칙:
@@ -32,10 +30,10 @@ export default async function handler(req, res) {
   if (typeof body === 'string') {
     try { body = JSON.parse(body || '{}') } catch { return send(res, 400, { error: 'bad json' }) }
   }
-  const { kind, advisor, data } = body || {}
+  const { kind, data } = body || {}
   if (!data || JSON.stringify(data).length > 12000) return send(res, 400, { error: 'bad data' })
 
-  const persona = PERSONAS[advisor] || PERSONAS.analyst
+  const persona = PERSONAS.analyst
   const task = kind === 'final'
     ? '아래는 플레이어의 12개월 전체 기록이다. 한 판 전체를 돌아보는 총평을 해라.'
     : '아래는 방금 끝난 달의 결산이다. 이번 달을 돌아보는 조언을 해라.'
